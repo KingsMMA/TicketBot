@@ -1,6 +1,6 @@
 import {ButtonStyle, Snowflake} from "discord-api-types/v10";
 
-export type MongoEmbed = {
+export type DbEmbed = {
     title: string;
     description: string;
     color: string;
@@ -11,22 +11,22 @@ export type MongoEmbed = {
     }[];
 };
 
-export type MongoButton = {
+export type DbButton = {
     type: number;
     customId: string;
     label: string;
     style: ButtonStyle;
 };
 
-export type MongoMessage = {
+export type DbMessage = {
     content: string;
-    embeds: MongoEmbed[];
-    buttons: MongoButton[];
+    embeds: DbEmbed[];
+    buttons: DbButton[];
 };
 
 export type TicketPanel = {
     guildId: string;
-    message: MongoMessage;
+    message: DbMessage;
 };
 
 export type TicketConfig = {
@@ -38,7 +38,7 @@ export type TicketConfig = {
     managerUsers: Snowflake[];
     viewerUsers: Snowflake[];
     maxTickets: number;
-    message: MongoMessage;
+    message: DbMessage;
 };
 
 export type ActiveTicket = TicketConfig & {
