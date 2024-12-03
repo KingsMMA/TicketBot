@@ -10,6 +10,8 @@ export default class {
 
     async run(interaction: Interaction) {
         if (interaction.isCommand()) {
+            if (!interaction.guild) return interaction.replyError('This command can only be used in a guild.');
+
             const command = this.client.commands.get(interaction.commandName);
             if (!command) return;
 
