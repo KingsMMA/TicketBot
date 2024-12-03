@@ -1,0 +1,39 @@
+{
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "rules": {
+        "quotes": ["error", "single", { "avoidEscape": true }],
+        "@typescript-eslint/no-var-requires": "off",
+        "@typescript-eslint/consistent-type-imports": "error",
+        "@typescript-eslint/no-unused-vars": "off",
+        "simple-import-sort/imports": "error",
+        "simple-import-sort/exports": "error",
+        "unused-imports/no-unused-imports": "error",
+        "unused-imports/no-unused-vars": [
+            "warn",
+            {
+                "vars": "all",
+                "varsIgnorePattern": "^_",
+                "args": "after-used",
+                "argsIgnorePattern": "^_"
+            }
+        ],
+        "newline-per-chained-call": ["error", { "ignoreChainWithDepth": 1 }],
+        "indent": ["error", 4, { "SwitchCase": 1 }],
+        "array-bracket-newline": ["error", { "multiline": true, "minItems": 1 }],
+        "eol-last": ["error", "always"],
+        "comma-dangle": ["error", "only-multiline"],
+        "semi": ["error", "always"],
+        "arrow-parens": ["error", "as-needed"],
+        "quote-props": ["error", "as-needed"],
+        "object-curly-spacing": ["error", "always"]
+    },
+    "plugins": ["simple-import-sort", "@typescript-eslint", "unused-imports", "prettier"],
+    "parserOptions": {
+        "sourceType": "module",
+        "ecmaVersion": "latest"
+    }
+}
