@@ -200,6 +200,26 @@ export default class TicketConfigCommand extends BaseCommand {
                     ],
                 },
                 {
+                    name: 'clone',
+                    description: 'Clone a ticket config.',
+                    type: ApplicationCommandOptionType.Subcommand,
+                    options: [
+                        {
+                            name: 'name',
+                            description: 'The name of the ticket config to clone.',
+                            type: ApplicationCommandOptionType.String,
+                            required: true,
+                            autocomplete: true,
+                        },
+                        {
+                            name: 'new-name',
+                            description: 'The name of the new ticket config.',
+                            type: ApplicationCommandOptionType.String,
+                            required: true,
+                        },
+                    ],
+                },
+                {
                     name: 'delete',
                     description: 'Delete a ticket config.',
                     type: ApplicationCommandOptionType.Subcommand,
@@ -235,6 +255,8 @@ export default class TicketConfigCommand extends BaseCommand {
                 return this.setDefaultOverride(interaction);
             case 'remove-default-override':
                 return this.removeDefaultOverride(interaction);
+            case 'clone':
+                return this.cloneConfig(interaction);
             case 'delete':
                 return this.deleteConfig(interaction);
             default:
@@ -445,6 +467,22 @@ export default class TicketConfigCommand extends BaseCommand {
         await this.client.main.mongo.updateTicketConfig(name, config);
 
         return interaction.replySuccess(`Default override removed for ${userRole}.`);
+    }
+
+    async cloneConfig(interaction: ChatInputCommandInteraction) {
+        const name = interaction.options.getString('name', true);
+        const newName = interaction.options.getString('new-name', true);
+
+        const configs = await this.client.main.mongo.fetchTicketConfigs(interaction.guildId!);
+        if (!configs[name])
+            return interaction.replyError('Ticket config not found.');
+        if (configs[newName])
+            return interaction.replyError('A ticket config with that name already exists.');
+
+        const config = configs[name];
+        config.type = newName;
+        await this.client.main.mongo.addTicketConfig(newName, config);
+        return interaction.replySuccess(`Ticket config \`${newName}\` cloned from \`${name}\`.`);
     }
 
     async deleteConfig(interaction: ChatInputCommandInteraction) {
