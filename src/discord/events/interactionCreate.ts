@@ -1,6 +1,7 @@
 import type { Interaction } from 'discord.js';
 
 import type TicketBot from '../ticketBot';
+import {createTicket} from "../utils/ticketInteractions";
 
 export default class {
     client: TicketBot;
@@ -31,29 +32,9 @@ export default class {
             if (!interaction.guild) return interaction.replyError('This button can only be used in a guild.');
 
             if (interaction.customId.startsWith('create-ticket:')) {
-                await interaction.deferReply({ ephemeral: true });
-
                 const ticketConfigName = interaction.customId.split(':')[1];
-                const ticketConfig = await this.client.main.mongo.fetchTicketConfigs(interaction.guildId!)
-                    .then(configs => configs[ticketConfigName]);
-                if (!ticketConfig) return;
 
-                const usersOpenTickets = await this.client.main.mongo.fetchActiveTickets(interaction.guildId!)
-                    .then(tickets => Object.values(tickets))
-                    .then(tickets => tickets.filter(ticket => ticket.owner === interaction.user.id && ticket.type === ticketConfigName));
-
-                if (usersOpenTickets.length >= ticketConfig.maxTickets)
-                    return interaction.replyError('You already have the maximum number of open tickets for this type.  Please close one before opening another.');
-
-                await interaction.editReply('Creating ticket...');
-
-                const member = await interaction.guild.members.fetch(interaction.user.id)
-                    .catch(() => null);
-                if (!member) return interaction.replyError('Failed to fetch member.');
-
-                const ticketChannelId = await this.client.tickets.createTicket(member, ticketConfig);
-                if (!ticketChannelId) return interaction.replyError('Failed to create ticket.');
-                return interaction.editReply(`Ticket created!  <#${ticketChannelId}>`);
+                return createTicket(interaction, ticketConfigName);
             }
         }
     }

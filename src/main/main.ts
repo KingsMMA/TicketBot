@@ -18,6 +18,8 @@ export default class Main {
     }
 
     async initialize() {
+        main = this;
+
         dotenv.config({
             path: __dirname + path.sep + '..' + path.sep + '..' + path.sep + '.env',
         });
@@ -35,3 +37,5 @@ export default class Main {
         fs.writeFileSync('./src/main/data/config.json', JSON.stringify(config, null, 2));
     }
 }
+
+export let main: Main;
