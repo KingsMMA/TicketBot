@@ -1,12 +1,12 @@
-import {
+import type {
     ButtonInteraction,
     ChatInputCommandInteraction,
     GuildMemberRoleManager,
     GuildTextBasedChannel, PermissionsBitField
 } from 'discord.js';
+import { PermissionFlagsBits } from 'discord-api-types/v10';
 
 import { main } from '../../main/main';
-import {PermissionFlagsBits} from "discord-api-types/v10";
 
 export class TicketInteractions {
 

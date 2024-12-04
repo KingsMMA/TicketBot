@@ -1,4 +1,4 @@
-import type {GuildMember, GuildTextBasedChannel} from 'discord.js';
+import type { GuildMember, GuildTextBasedChannel } from 'discord.js';
 import type { Snowflake } from 'discord-api-types/v10';
 import { ChannelType, PermissionFlagsBits } from 'discord-api-types/v10';
 

@@ -1,11 +1,11 @@
-import {
-    AutocompleteInteraction,
+import type {
     ChatInputCommandInteraction,
     GuildMemberRoleManager,
-    GuildTextBasedChannel,
+    GuildTextBasedChannel } from 'discord.js';
+import type { PermissionsBitField } from 'discord.js';
+import {
     Role
 } from 'discord.js';
-import {PermissionsBitField} from 'discord.js';
 import {
     ApplicationCommandOptionType,
     ApplicationCommandType,
@@ -13,10 +13,10 @@ import {
     type Snowflake
 } from 'discord-api-types/v10';
 
+import { main } from '../../../main/main';
 import type TicketBot from '../../ticketBot';
 import KingsDevEmbedBuilder from '../../utils/kingsDevEmbedBuilder';
 import BaseCommand from '../base.command';
-import {main} from "../../../main/main";
 
 export default class AddCommand extends BaseCommand {
     constructor(client: TicketBot) {

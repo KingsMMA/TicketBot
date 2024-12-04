@@ -305,13 +305,17 @@ export default class TicketConfigCommand extends BaseCommand {
                     .addField('Name Template', config.nameTemplate, true)
                     .addField('Max Tickets', config.maxTickets.toString(), true)
                     .addField('Can Owner Manage?', config.ownerCanManage ? 'Yes' : 'No', true)
-                    .addField('Default Manager Roles', config.managerRoles.length ? config.managerRoles.map(id => `<@&${id}>`).join(', ') : 'None', true)
-                    .addField('Default Viewer Roles', config.viewerRoles.length ? config.viewerRoles.map(id => `<@&${id}>`).join(', ') : 'None', true)
-                    .addField('Default Manager Users', config.managerUsers.length ? config.managerUsers.map(id => `<@${id}>`).join(', ') : 'None', true)
-                    .addField('Default Viewer Users', config.viewerUsers.length ? config.viewerUsers.map(id => `<@${id}>`).join(', ') : 'None', true)
+                    .addField('Default Manager Roles', config.managerRoles.length ? config.managerRoles.map(id => `<@&${id}>`)
+                        .join(', ') : 'None', true)
+                    .addField('Default Viewer Roles', config.viewerRoles.length ? config.viewerRoles.map(id => `<@&${id}>`)
+                        .join(', ') : 'None', true)
+                    .addField('Default Manager Users', config.managerUsers.length ? config.managerUsers.map(id => `<@${id}>`)
+                        .join(', ') : 'None', true)
+                    .addField('Default Viewer Users', config.viewerUsers.length ? config.viewerUsers.map(id => `<@${id}>`)
+                        .join(', ') : 'None', true)
                     .setColor('Blurple'),
             ]
-        })
+        });
     }
 
     async createConfig(interaction: ChatInputCommandInteraction) {

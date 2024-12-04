@@ -1,5 +1,5 @@
-import type { AutocompleteInteraction, ChatInputCommandInteraction } from 'discord.js';
-import { ApplicationCommandOptionType, ApplicationCommandType } from 'discord-api-types/v10';
+import type { ChatInputCommandInteraction } from 'discord.js';
+import { ApplicationCommandType } from 'discord-api-types/v10';
 
 import type TicketBot from '../../ticketBot';
 import { TicketInteractions } from '../../utils/ticketInteractions';
