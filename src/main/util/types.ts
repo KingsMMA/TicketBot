@@ -1,4 +1,4 @@
-import {ButtonStyle, Snowflake} from "discord-api-types/v10";
+import type { ButtonStyle, Snowflake } from 'discord-api-types/v10';
 
 export type DbEmbed = {
     title: string;

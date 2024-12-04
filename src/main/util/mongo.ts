@@ -1,9 +1,9 @@
+import type { Snowflake } from 'discord-api-types/v10';
 import type { Db } from 'mongodb';
 import { MongoClient } from 'mongodb';
 
 import type Main from '../main';
-import {Snowflake} from "discord-api-types/v10";
-import {TicketConfig, TicketPanel} from "./types";
+import type { TicketConfig, TicketPanel } from './types';
 
 export default class Mongo {
     private mongo!: Db;
@@ -22,7 +22,7 @@ export default class Mongo {
         return this.mongo
             .collection('panels')
             .findOne({ guildId })
-            .then((doc) => doc?.panels || []);
+            .then(doc => doc?.panels || []);
     }
 
     async addPanel(panel: TicketPanel) {
@@ -57,7 +57,7 @@ export default class Mongo {
         return this.mongo
             .collection('ticketConfigs')
             .findOne({ guildId })
-            .then((doc) => doc?.configs || {});
+            .then(doc => doc?.configs || {});
     }
 
 }

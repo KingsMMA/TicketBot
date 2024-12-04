@@ -1,6 +1,6 @@
-import type {AutocompleteInteraction, ChatInputCommandInteraction} from 'discord.js';
-import {PermissionsBitField} from 'discord.js';
-import {ApplicationCommandOptionType, ApplicationCommandType} from 'discord-api-types/v10';
+import type { ChatInputCommandInteraction } from 'discord.js';
+import { PermissionsBitField } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType } from 'discord-api-types/v10';
 
 import type TicketBot from '../../ticketBot';
 import KingsDevEmbedBuilder from '../../utils/kingsDevEmbedBuilder';
@@ -184,7 +184,11 @@ export default class TicketConfigCommand extends BaseCommand {
                 new KingsDevEmbedBuilder()
                     .setTitle('Ticket Configs')
                     .setDescription(
-                        Object.entries(configs).map(([name, config]) => `**• ${name}** - <#${config.category}> - ${config.nameTemplate} - ${config.maxTickets}`).join('\n'),
+                        Object.entries(configs)
+                            .map(([
+                                name, config
+                            ]) => `**• ${name}** - <#${config.category}> - ${config.nameTemplate} - ${config.maxTickets}`)
+                            .join('\n'),
                     )
                     .setColor(0x006994),
             ],

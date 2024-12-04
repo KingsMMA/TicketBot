@@ -1,14 +1,19 @@
-import {DbButton, DbEmbed, DbMessage} from "../../main/util/types";
-import {
-    ActionRowBuilder,
-    ButtonBuilder,
+import type { UUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
+
+import type {
     ButtonInteraction,
     ChatInputCommandInteraction,
     InteractionCollector,
-    Message, ModalBuilder, StringSelectMenuBuilder, TextInputBuilder
-} from "discord.js";
-import {APIEmbed, ButtonStyle, ComponentType, TextInputStyle} from "discord-api-types/v10";
-import {randomUUID, UUID} from "node:crypto";
+    Message } from 'discord.js';
+import {
+    ActionRowBuilder,
+    ButtonBuilder, ModalBuilder, StringSelectMenuBuilder, TextInputBuilder
+} from 'discord.js';
+import type { APIEmbed } from 'discord-api-types/v10';
+import { ButtonStyle, ComponentType, TextInputStyle } from 'discord-api-types/v10';
+
+import type { DbButton, DbEmbed, DbMessage } from '../../main/util/types';
 
 
 export default class DbMessageEditor {
@@ -41,11 +46,11 @@ export default class DbMessageEditor {
 
             this.collector = this.editor.createMessageComponentCollector({
                 componentType: ComponentType.Button,
-                filter: (interaction) => interaction.user.id === this.interaction!.user.id
+                filter: interaction => interaction.user.id === this.interaction!.user.id
                 && interaction.customId.endsWith(this.id),
                 time: 120_000,
             });
-            this.collector.on('collect', async (interaction) => {
+            this.collector.on('collect', async interaction => {
                 this.collector?.resetTimer();
 
                 switch (interaction.customId.split('-')[0]) {
@@ -55,7 +60,7 @@ export default class DbMessageEditor {
                         break;
                     case 'content':
                         let contentInput = new TextInputBuilder()
-                            .setCustomId(`content`)
+                            .setCustomId('content')
                             .setLabel('New Content:')
                             .setRequired(false)
                             .setStyle(TextInputStyle.Paragraph);
@@ -72,11 +77,12 @@ export default class DbMessageEditor {
                                         ]),
                                 )
                         );
-                        let contentSubmission = await interaction.awaitModalSubmit({
+                        const contentSubmission = await interaction.awaitModalSubmit({
                             time: 120_000,
-                            filter: (interaction) => interaction.user.id === this.interaction!.user.id
+                            filter: interaction => interaction.user.id === this.interaction!.user.id
                                 && interaction.customId === `content-${this.id}`,
-                        }).catch(() => null);
+                        })
+                            .catch(() => null);
                         if (contentSubmission) {
                             void contentSubmission.deferUpdate();
                             this.message.content = contentSubmission.components[0].components[0].value || '';
@@ -100,7 +106,7 @@ export default class DbMessageEditor {
                         break;
                     case 'title':
                         let titleInput = new TextInputBuilder()
-                            .setCustomId(`title`)
+                            .setCustomId('title')
                             .setLabel('New Title:')
                             .setRequired(false)
                             .setStyle(TextInputStyle.Short);
@@ -117,11 +123,12 @@ export default class DbMessageEditor {
                                         ]),
                                 )
                         );
-                        let titleSubmission = await interaction.awaitModalSubmit({
+                        const titleSubmission = await interaction.awaitModalSubmit({
                             time: 120_000,
-                            filter: (interaction) => interaction.user.id === this.interaction!.user.id
+                            filter: interaction => interaction.user.id === this.interaction!.user.id
                                 && interaction.customId === `title-${this.id}`,
-                        }).catch(() => null);
+                        })
+                            .catch(() => null);
                         if (titleSubmission) {
                             void titleSubmission.deferUpdate();
                             this.message.embeds[0].title = titleSubmission.components[0].components[0].value || '';
@@ -130,7 +137,7 @@ export default class DbMessageEditor {
                         break;
                     case 'description':
                         let descriptionInput = new TextInputBuilder()
-                            .setCustomId(`description`)
+                            .setCustomId('description')
                             .setLabel('New Description:')
                             .setRequired(true)
                             .setStyle(TextInputStyle.Paragraph);
@@ -147,11 +154,12 @@ export default class DbMessageEditor {
                                         ]),
                                 )
                         );
-                        let descriptionSubmission = await interaction.awaitModalSubmit({
+                        const descriptionSubmission = await interaction.awaitModalSubmit({
                             time: 120_000,
-                            filter: (interaction) => interaction.user.id === this.interaction!.user.id
+                            filter: interaction => interaction.user.id === this.interaction!.user.id
                                 && interaction.customId === `description-${this.id}`,
-                        }).catch(() => null);
+                        })
+                            .catch(() => null);
                         if (descriptionSubmission) {
                             void descriptionSubmission.deferUpdate();
                             this.message.embeds[0].description = descriptionSubmission.components[0].components[0].value || 'Please provide a description.';
@@ -160,7 +168,7 @@ export default class DbMessageEditor {
                         break;
                     case 'color':
                         let colourInput = new TextInputBuilder()
-                            .setCustomId(`color`)
+                            .setCustomId('color')
                             .setLabel('New Color:')
                             .setRequired(false)
                             .setPlaceholder('Hex color code (no #).')
@@ -178,18 +186,19 @@ export default class DbMessageEditor {
                                         ]),
                                 )
                         );
-                        let colourSubmission = await interaction.awaitModalSubmit({
+                        const colourSubmission = await interaction.awaitModalSubmit({
                             time: 120_000,
-                            filter: (interaction) => interaction.user.id === this.interaction!.user.id
+                            filter: interaction => interaction.user.id === this.interaction!.user.id
                                 && interaction.customId === `color-${this.id}`,
-                        }).catch(() => null);
+                        })
+                            .catch(() => null);
                         if (colourSubmission) {
                             // check format of colour
                             if (!/^[0-9A-Fa-f]{6}$/.test(colourSubmission.components[0].components[0].value || '000000')) {
                                 void colourSubmission.reply({
                                     content: 'Invalid color format. Please provide a valid hex color code (no #).',
                                     ephemeral: true,
-                                })
+                                });
                                 return;
                             }
                             void colourSubmission.deferUpdate();
@@ -230,11 +239,12 @@ export default class DbMessageEditor {
                                         )
                                 )
                         );
-                        let fieldSubmission = await interaction.awaitModalSubmit({
+                        const fieldSubmission = await interaction.awaitModalSubmit({
                             time: 120_000,
-                            filter: (interaction) => interaction.user.id === this.interaction!.user.id
+                            filter: interaction => interaction.user.id === this.interaction!.user.id
                                 && interaction.customId === `afi-${this.id}`,
-                        }).catch(() => null);
+                        })
+                            .catch(() => null);
 
                         if (!fieldSubmission) return;
                         const name = fieldSubmission?.components[0].components[0].value || '';
@@ -260,7 +270,7 @@ export default class DbMessageEditor {
                         if (this.message.embeds[0].fields.length === 0)
                             return interaction.replyError('No fields to edit.', true);
                         await interaction.deferReply();
-                        let selectFieldMessage = await interaction.followUp({
+                        const selectFieldMessage = await interaction.followUp({
                             content: 'Select a field to edit or remove.',
                             components: [
                                 new ActionRowBuilder<StringSelectMenuBuilder>()
@@ -276,15 +286,16 @@ export default class DbMessageEditor {
                                                     value: index.toString(),
                                                 })),
                                             )
-                                ),
+                                    ),
                             ],
                         });
-                        let selectField = await selectFieldMessage.awaitMessageComponent({
+                        const selectField = await selectFieldMessage.awaitMessageComponent({
                             time: 120_000,
-                            filter: (interaction) => interaction.user.id === this.interaction!.user.id
+                            filter: interaction => interaction.user.id === this.interaction!.user.id
                                 && interaction.customId === `sel-field-${this.id}`,
                             componentType: ComponentType.StringSelect,
-                        }).catch(() => null);
+                        })
+                            .catch(() => null);
                         if (!selectField) return;
                         const index = parseInt(selectField.values[0]);
                         const field = this.message.embeds[0].fields[index];
@@ -325,11 +336,12 @@ export default class DbMessageEditor {
                         );
                         void selectFieldMessage.delete();
 
-                        let editFieldSubmission = await selectField.awaitModalSubmit({
+                        const editFieldSubmission = await selectField.awaitModalSubmit({
                             time: 120_000,
-                            filter: (interaction) => interaction.user.id === this.interaction!.user.id
+                            filter: interaction => interaction.user.id === this.interaction!.user.id
                                 && interaction.customId === `edit-field-${this.id}`,
-                        }).catch(() => null);
+                        })
+                            .catch(() => null);
                         if (!editFieldSubmission) return;
 
                         void editFieldSubmission.deferUpdate();
@@ -355,16 +367,16 @@ export default class DbMessageEditor {
                                     new ActionRowBuilder<TextInputBuilder>()
                                         .addComponents([
                                             new TextInputBuilder()
-                                                .setCustomId(`id`)
+                                                .setCustomId('id')
                                                 .setLabel('Button ID:')
                                                 .setRequired(true)
                                                 .setStyle(TextInputStyle.Short)
                                                 .setPlaceholder('"create-ticket-${ticket-name}", "close"'),
-                                            ]),
+                                        ]),
                                     new ActionRowBuilder<TextInputBuilder>()
                                         .addComponents([
                                             new TextInputBuilder()
-                                                .setCustomId(`label`)
+                                                .setCustomId('label')
                                                 .setLabel('Button Label:')
                                                 .setRequired(true)
                                                 .setStyle(TextInputStyle.Short),
@@ -372,7 +384,7 @@ export default class DbMessageEditor {
                                     new ActionRowBuilder<TextInputBuilder>()
                                         .addComponents([
                                             new TextInputBuilder()
-                                                .setCustomId(`style`)
+                                                .setCustomId('style')
                                                 .setLabel('Button Style:')
                                                 .setRequired(true)
                                                 .setStyle(TextInputStyle.Short)
@@ -381,7 +393,7 @@ export default class DbMessageEditor {
                                     new ActionRowBuilder<TextInputBuilder>()
                                         .addComponents([
                                             new TextInputBuilder()
-                                                .setCustomId(`disabled`)
+                                                .setCustomId('disabled')
                                                 .setLabel('Disabled:')
                                                 .setRequired(true)
                                                 .setStyle(TextInputStyle.Short)
@@ -390,18 +402,19 @@ export default class DbMessageEditor {
                                     new ActionRowBuilder<TextInputBuilder>()
                                         .addComponents([
                                             new TextInputBuilder()
-                                                .setCustomId(`emoji`)
+                                                .setCustomId('emoji')
                                                 .setLabel('Button Emoji:')
                                                 .setRequired(false)
                                                 .setStyle(TextInputStyle.Short),
                                         ]),
                                 )
                         );
-                        let buttonSubmission = await interaction.awaitModalSubmit({
+                        const buttonSubmission = await interaction.awaitModalSubmit({
                             time: 120_000,
-                            filter: (interaction) => interaction.user.id === this.interaction!.user.id
+                            filter: interaction => interaction.user.id === this.interaction!.user.id
                                 && interaction.customId === `add-button-${this.id}`,
-                        }).catch(() => null);
+                        })
+                            .catch(() => null);
                         if (buttonSubmission) {
                             await buttonSubmission.deferReply({ ephemeral: true });
                             try {
@@ -426,7 +439,7 @@ export default class DbMessageEditor {
                         if (this.message.buttons.length === 0)
                             return interaction.replyError('No buttons to edit.', true);
                         await interaction.deferReply();
-                        let selectButtonMessage = await interaction.followUp({
+                        const selectButtonMessage = await interaction.followUp({
                             content: 'Select a button to edit.',
                             components: [
                                 new ActionRowBuilder<StringSelectMenuBuilder>()
@@ -445,12 +458,13 @@ export default class DbMessageEditor {
                                     ),
                             ],
                         });
-                        let selectButton = await selectButtonMessage.awaitMessageComponent({
+                        const selectButton = await selectButtonMessage.awaitMessageComponent({
                             time: 120_000,
-                            filter: (interaction) => interaction.user.id === this.interaction!.user.id
+                            filter: interaction => interaction.user.id === this.interaction!.user.id
                                 && interaction.customId === `sel-button-${this.id}`,
                             componentType: ComponentType.StringSelect,
-                        }).catch(() => null);
+                        })
+                            .catch(() => null);
                         if (!selectButton) return;
                         const ix = parseInt(selectButton.values[0]);
                         const button = this.message.buttons[ix];
@@ -463,7 +477,7 @@ export default class DbMessageEditor {
                                     new ActionRowBuilder<TextInputBuilder>()
                                         .addComponents([
                                             new TextInputBuilder()
-                                                .setCustomId(`id`)
+                                                .setCustomId('id')
                                                 .setLabel('Button ID:')
                                                 .setRequired(false)
                                                 .setStyle(TextInputStyle.Short)
@@ -472,7 +486,7 @@ export default class DbMessageEditor {
                                     new ActionRowBuilder<TextInputBuilder>()
                                         .addComponents([
                                             new TextInputBuilder()
-                                                .setCustomId(`label`)
+                                                .setCustomId('label')
                                                 .setLabel('Button Label:')
                                                 .setRequired(false)
                                                 .setStyle(TextInputStyle.Short)
@@ -481,7 +495,7 @@ export default class DbMessageEditor {
                                     new ActionRowBuilder<TextInputBuilder>()
                                         .addComponents([
                                             new TextInputBuilder()
-                                                .setCustomId(`style`)
+                                                .setCustomId('style')
                                                 .setLabel('Button Style:')
                                                 .setRequired(false)
                                                 .setStyle(TextInputStyle.Short)
@@ -490,7 +504,7 @@ export default class DbMessageEditor {
                                     new ActionRowBuilder<TextInputBuilder>()
                                         .addComponents([
                                             new TextInputBuilder()
-                                                .setCustomId(`disabled`)
+                                                .setCustomId('disabled')
                                                 .setLabel('Disabled:')
                                                 .setRequired(false)
                                                 .setStyle(TextInputStyle.Short)
@@ -499,7 +513,7 @@ export default class DbMessageEditor {
                                     new ActionRowBuilder<TextInputBuilder>()
                                         .addComponents([
                                             new TextInputBuilder()
-                                                .setCustomId(`emoji`)
+                                                .setCustomId('emoji')
                                                 .setLabel('Button Emoji:')
                                                 .setRequired(false)
                                                 .setStyle(TextInputStyle.Short)
@@ -510,11 +524,12 @@ export default class DbMessageEditor {
 
                         void selectButtonMessage.delete();
 
-                        let editButtonSubmission = await selectButton.awaitModalSubmit({
+                        const editButtonSubmission = await selectButton.awaitModalSubmit({
                             time: 120_000,
-                            filter: (interaction) => interaction.user.id === this.interaction!.user.id
+                            filter: interaction => interaction.user.id === this.interaction!.user.id
                                 && interaction.customId === `edit-button-${this.id}`,
-                        }).catch(() => null);
+                        })
+                            .catch(() => null);
                         if (!editButtonSubmission) return;
 
                         await editButtonSubmission.deferUpdate();
@@ -534,7 +549,7 @@ export default class DbMessageEditor {
                         if (this.message.buttons.length === 0)
                             return interaction.replyError('No buttons to remove.', true);
                         await interaction.deferReply();
-                        let selectRemoveButtonMessage = await interaction.followUp({
+                        const selectRemoveButtonMessage = await interaction.followUp({
                             content: 'Select a button to remove.',
                             components: [
                                 new ActionRowBuilder<StringSelectMenuBuilder>()
@@ -553,12 +568,13 @@ export default class DbMessageEditor {
                                     ),
                             ],
                         });
-                        let selectRemoveButton = await selectRemoveButtonMessage.awaitMessageComponent({
+                        const selectRemoveButton = await selectRemoveButtonMessage.awaitMessageComponent({
                             time: 120_000,
-                            filter: (interaction) => interaction.user.id === this.interaction!.user.id
+                            filter: interaction => interaction.user.id === this.interaction!.user.id
                                 && interaction.customId === `sel-remove-button-${this.id}`,
                             componentType: ComponentType.StringSelect,
-                        }).catch(() => null);
+                        })
+                            .catch(() => null);
                         void selectRemoveButtonMessage.delete();
                         if (!selectRemoveButton) return;
                         const ixx = parseInt(selectRemoveButton.values[0]);
@@ -663,7 +679,7 @@ export default class DbMessageEditor {
     }
 
     static parseEmbeds(embeds: DbEmbed[]): APIEmbed[] {
-        return embeds.map((embed) => this.parseEmbed(embed));
+        return embeds.map(embed => this.parseEmbed(embed));
     }
 
     static parseEmbed(embed: DbEmbed): APIEmbed {
@@ -671,7 +687,7 @@ export default class DbMessageEditor {
             title: embed.title,
             description: embed.description,
             color: parseInt(embed.color, 16),
-            fields: embed.fields.map((field) => ({
+            fields: embed.fields.map(field => ({
                 name: field.name,
                 value: field.value,
                 inline: field.inline,
@@ -681,20 +697,24 @@ export default class DbMessageEditor {
 
     static parseButtons(buttons: DbButton[]): ActionRowBuilder<ButtonBuilder>[] {
         if (buttons.length === 0) return [];
-        if (buttons.length > 5) return [...this.parseButtons(buttons.slice(0, 5)), ...this.parseButtons(buttons.slice(5))];
-        return [new ActionRowBuilder<ButtonBuilder>()
-            .addComponents(
-                buttons.map((button) => {
-                    let builder = new ButtonBuilder()
-                        .setCustomId(button.customId)
-                        .setLabel(button.label)
-                        .setStyle(button.style)
-                        .setDisabled(button.disabled);
-                    if (button.emoji)
-                        builder.setEmoji(button.emoji);
-                    return builder
-                }
-            ))];
+        if (buttons.length > 5) return [
+            ...this.parseButtons(buttons.slice(0, 5)), ...this.parseButtons(buttons.slice(5))
+        ];
+        return [
+            new ActionRowBuilder<ButtonBuilder>()
+                .addComponents(
+                    buttons.map(button => {
+                        const builder = new ButtonBuilder()
+                            .setCustomId(button.customId)
+                            .setLabel(button.label)
+                            .setStyle(button.style)
+                            .setDisabled(button.disabled);
+                        if (button.emoji)
+                            builder.setEmoji(button.emoji);
+                        return builder;
+                    }
+                    ))
+        ];
     }
 
 }

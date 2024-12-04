@@ -1,12 +1,11 @@
-import type {AutocompleteInteraction, ChatInputCommandInteraction, GuildTextBasedChannel} from 'discord.js';
-import {PermissionsBitField} from 'discord.js';
-import {ApplicationCommandOptionType, ApplicationCommandType} from 'discord-api-types/v10';
+import type { AutocompleteInteraction, ChatInputCommandInteraction, GuildTextBasedChannel } from 'discord.js';
+import { PermissionsBitField } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType } from 'discord-api-types/v10';
 
+import type { DbMessage, TicketPanel } from '../../../main/util/types';
 import type ticketBot from '../../ticketBot';
-import KingsDevEmbedBuilder from '../../utils/kingsDevEmbedBuilder';
+import DbMessageEditor from '../../utils/dbMessageEditor';
 import BaseCommand from '../base.command';
-import {DbMessage, TicketPanel} from "../../../main/util/types";
-import DbMessageEditor from "../../utils/dbMessageEditor";
 
 export default class PanelCommand extends BaseCommand {
     constructor(client: ticketBot) {
@@ -109,7 +108,8 @@ export default class PanelCommand extends BaseCommand {
         const panels = await this.client.main.mongo.getPanels(interaction.guildId!);
         if (!panels.length) return interaction.replyError('No panels found.  Use `/panel create` to create a new panel.');
 
-        const panelList = panels.map((panel, index) => `${index + 1}. ${panel.name}`).join('\n');
+        const panelList = panels.map((panel, index) => `${index + 1}. ${panel.name}`)
+            .join('\n');
         return interaction.replySuccess(panelList);
     }
 
@@ -117,7 +117,7 @@ export default class PanelCommand extends BaseCommand {
         const panelName = interaction.options.getString('panel', true);
         const channelOpt = interaction.options.getChannel('channel', false) || interaction.channel!;
         const panels = await this.client.main.mongo.getPanels(interaction.guildId!);
-        const panel = panels.find((p) => p.name === panelName);
+        const panel = panels.find(p => p.name === panelName);
         if (!panel) return interaction.replyError('Panel not found.');
 
         const channel = await this.client.channels.fetch(channelOpt.id)
@@ -139,7 +139,7 @@ export default class PanelCommand extends BaseCommand {
     async createPanel(interaction: ChatInputCommandInteraction) {
         const panelName = interaction.options.getString('panel', true);
         const panels = await this.client.main.mongo.getPanels(interaction.guildId!);
-        if (panels.find((p) => p.name === panelName)) return interaction.replyError('A panel with that name already exists.');
+        if (panels.find(p => p.name === panelName)) return interaction.replyError('A panel with that name already exists.');
 
         let message: DbMessage = {
             content: '',
@@ -147,8 +147,9 @@ export default class PanelCommand extends BaseCommand {
             buttons: [],
         };
 
-        message = await new DbMessageEditor(message).editMessage(interaction);
-        let panel: TicketPanel = {
+        message = await new DbMessageEditor(message)
+            .editMessage(interaction);
+        const panel: TicketPanel = {
             guildId: interaction.guildId!,
             name: panelName,
             message: message,
@@ -161,11 +162,12 @@ export default class PanelCommand extends BaseCommand {
     async editPanel(interaction: ChatInputCommandInteraction) {
         const panelName = interaction.options.getString('panel', true);
         const panels = await this.client.main.mongo.getPanels(interaction.guildId!);
-        const panel = panels.find((p) => p.name === panelName);
+        const panel = panels.find(p => p.name === panelName);
         if (!panel) return interaction.replyError('Panel not found.');
 
         let message: DbMessage = panel.message;
-        message = await new DbMessageEditor(message).editMessage(interaction);
+        message = await new DbMessageEditor(message)
+            .editMessage(interaction);
         panel.message = message;
 
         await this.client.main.mongo.updatePanel(panel);
@@ -175,7 +177,7 @@ export default class PanelCommand extends BaseCommand {
     async deletePanel(interaction: ChatInputCommandInteraction) {
         const panelName = interaction.options.getString('panel', true);
         const panels = await this.client.main.mongo.getPanels(interaction.guildId!);
-        const panel = panels.find((p) => p.name === panelName);
+        const panel = panels.find(p => p.name === panelName);
         if (!panel) return interaction.replyError('Panel not found.');
 
         await this.client.main.mongo.deletePanel(interaction.guildId!, panel.name);
@@ -190,13 +192,15 @@ export default class PanelCommand extends BaseCommand {
 
             return interaction.respond(
                 panels
-                    .filter(panel => panel.name.toLowerCase().includes(interaction.options.getString('panel', true).toLowerCase()))
+                    .filter(panel => panel.name.toLowerCase()
+                        .includes(interaction.options.getString('panel', true)
+                            .toLowerCase()))
                     .map(panel => {
-                    return {
-                        name: panel.name,
-                        value: panel.name,
-                    };
-                })
+                        return {
+                            name: panel.name,
+                            value: panel.name,
+                        };
+                    })
             );
         }
 
