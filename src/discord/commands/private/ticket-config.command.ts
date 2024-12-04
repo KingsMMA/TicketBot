@@ -66,6 +66,12 @@ export default class TicketConfigCommand extends BaseCommand {
                             type: ApplicationCommandOptionType.Integer,
                             required: true,
                         },
+                        {
+                            name: 'can-owner-manage',
+                            description: 'Whether the ticket owner can manage the ticket - AKA add/remove users, close the ticket, etc..',
+                            type: ApplicationCommandOptionType.Boolean,
+                            required: true,
+                        }
                     ],
                 },
                 {
@@ -99,6 +105,12 @@ export default class TicketConfigCommand extends BaseCommand {
                             name: 'max-tickets',
                             description: 'The maximum amount of tickets a user can have open.',
                             type: ApplicationCommandOptionType.Integer,
+                            required: false,
+                        },
+                        {
+                            name: 'can-owner-manage',
+                            description: 'Whether the ticket owner can manage the ticket - AKA add/remove users, close the ticket, etc..',
+                            type: ApplicationCommandOptionType.Boolean,
                             required: false,
                         },
                     ],
@@ -240,6 +252,7 @@ export default class TicketConfigCommand extends BaseCommand {
         const categoryOpt = interaction.options.getChannel('category', true);
         const nameTemplate = interaction.options.getString('name-template', true);
         const maxTickets = interaction.options.getInteger('max-tickets', true);
+        const canOwnerManage = interaction.options.getBoolean('can-owner-manage', true);
 
         const configs = await this.client.main.mongo.fetchTicketConfigs(interaction.guildId!);
         if (configs[name])
@@ -263,6 +276,7 @@ export default class TicketConfigCommand extends BaseCommand {
             viewerUsers: [],
             maxTickets,
             type: name,
+            ownerCanManage: canOwnerManage,
         };
 
         await this.client.main.mongo.addTicketConfig(name, config);
@@ -274,6 +288,7 @@ export default class TicketConfigCommand extends BaseCommand {
         const categoryOpt = interaction.options.getChannel('category');
         const nameTemplate = interaction.options.getString('name-template');
         const maxTickets = interaction.options.getInteger('max-tickets');
+        const canOwnerManage = interaction.options.getBoolean('can-owner-manage');
 
         const configs = await this.client.main.mongo.fetchTicketConfigs(interaction.guildId!);
         if (!configs[name])
@@ -295,6 +310,8 @@ export default class TicketConfigCommand extends BaseCommand {
                 return interaction.replyError('Max tickets must be at least 0.');
             config.maxTickets = maxTickets;
         }
+        
+        if (canOwnerManage !== null) config.ownerCanManage = canOwnerManage;
 
         await this.client.main.mongo.updateTicketConfig(name, config);
         return interaction.replySuccess(`Ticket config \`${name}\` updated.`);

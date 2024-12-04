@@ -39,6 +39,7 @@ export type TicketConfig = {
     viewerRoles: Snowflake[];
     managerUsers: Snowflake[];
     viewerUsers: Snowflake[];
+    ownerCanManage: boolean;
     maxTickets: number;
     message?: DbMessage;
     type: string;
