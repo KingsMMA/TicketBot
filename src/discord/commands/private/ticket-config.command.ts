@@ -371,6 +371,13 @@ export default class TicketConfigCommand extends BaseCommand {
 
     async deleteConfig(interaction: ChatInputCommandInteraction) {
         const name = interaction.options.getString('name', true);
+
+        const configs = await this.client.main.mongo.fetchTicketConfigs(interaction.guildId!);
+        if (!configs[name])
+            return interaction.replyError('Ticket config not found.');
+
+        await this.client.main.mongo.deleteTicketConfig(interaction.guildId!, name);
+        return interaction.replySuccess(`Ticket config \`${name}\` deleted.`);
     }
 
 }
