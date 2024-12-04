@@ -12,10 +12,15 @@ export type DbEmbed = {
 };
 
 export type DbButton = {
-    type: number;
     customId: string;
     label: string;
     style: ButtonStyle;
+    disabled: boolean;
+    emoji?: {
+        id?: string;
+        name?: string;
+        animated?: boolean;
+    };
 };
 
 export type DbMessage = {
@@ -26,6 +31,7 @@ export type DbMessage = {
 
 export type TicketPanel = {
     guildId: string;
+    name: string;
     message: DbMessage;
 };
 

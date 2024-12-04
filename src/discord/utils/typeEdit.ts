@@ -21,12 +21,14 @@ declare module 'discord.js' {
 CommandInteraction.prototype.replySuccess = ButtonInteraction.prototype.replySuccess = async function (message: string, ephemeral?: boolean) {
     if (this.replied || !this.isRepliable() || this.deferred)
         return this.editReply({
+            content: '',
             embeds: [
                 new KingsDevEmbedBuilder()
                     .setColor('Green')
                     .setTitle('Success')
                     .setDescription(message)
             ],
+            components: [],
         });
     else
         return this.reply({
@@ -43,12 +45,14 @@ CommandInteraction.prototype.replySuccess = ButtonInteraction.prototype.replySuc
 CommandInteraction.prototype.replyError = ButtonInteraction.prototype.replyError = async function (message: string, ephemeral?: boolean) {
     if (this.replied || !this.isRepliable() || this.deferred)
         return this.editReply({
+            content: '',
             embeds: [
                 new KingsDevEmbedBuilder()
                     .setColor('Red')
                     .setTitle('Error')
                     .setDescription(message)
             ],
+            components: [],
         });
     else
         return this.reply({

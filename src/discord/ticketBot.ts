@@ -1,10 +1,11 @@
-import type { ClientOptions } from 'discord.js';
+import type {ChatInputCommandInteraction, ClientOptions, CommandInteraction} from 'discord.js';
 import { Client, Collection } from 'discord.js';
 import type { PathLike } from 'fs';
 import path from 'path';
 
 import type Main from '../main/main';
 import type BaseCommand from './commands/base.command';
+import {DbMessage, TicketPanel} from "../main/util/types";
 
 export default class TicketBot extends Client {
     main: Main;
@@ -13,6 +14,8 @@ export default class TicketBot extends Client {
     constructor(main: Main, options: ClientOptions) {
         super(options);
         this.main = main;
+
+        this.on('error', console.error);
     }
 
     loadCommand(commandPath: PathLike, commandName: string) {
@@ -34,4 +37,5 @@ export default class TicketBot extends Client {
             return `Unable to load event ${eventName}: ${e}`;
         }
     }
+
 }
