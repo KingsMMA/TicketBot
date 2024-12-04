@@ -404,7 +404,6 @@ export default class DbMessageEditor {
                         }).catch(() => null);
                         if (buttonSubmission) {
                             await buttonSubmission.deferReply({ ephemeral: true });
-                            console.log(JSON.stringify(buttonSubmission.components));
                             try {
                                 this.message.buttons.push({
                                     customId: buttonSubmission.components[0].components[0].value || '',

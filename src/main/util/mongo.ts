@@ -3,7 +3,7 @@ import { MongoClient } from 'mongodb';
 
 import type Main from '../main';
 import {Snowflake} from "discord-api-types/v10";
-import {TicketPanel} from "./types";
+import {TicketConfig, TicketPanel} from "./types";
 
 export default class Mongo {
     private mongo!: Db;
@@ -51,6 +51,13 @@ export default class Mongo {
                 { guildId: panel.guildId, 'panels.name': panel.name },
                 { $set: { 'panels.$': panel } },
             );
+    }
+
+    async fetchTicketConfigs(guildId: Snowflake): Promise<Record<string, TicketConfig>> {
+        return this.mongo
+            .collection('ticketConfigs')
+            .findOne({ guildId })
+            .then((doc) => doc?.configs || {});
     }
 
 }

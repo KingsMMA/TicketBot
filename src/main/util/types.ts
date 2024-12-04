@@ -33,7 +33,7 @@ export type TicketPanel = {
 
 export type TicketConfig = {
     guildId: string;
-    parent: Snowflake;
+    category: Snowflake;
     nameTemplate: string;
     managerRoles: Snowflake[];
     viewerRoles: Snowflake[];
