@@ -60,4 +60,14 @@ export default class Mongo {
             .then(doc => doc?.configs || {});
     }
 
+    async addTicketConfig(name: string, config: TicketConfig) {
+        return this.mongo
+            .collection('ticketConfigs')
+            .updateOne(
+                { guildId: config.guildId },
+                { $set: { [`configs.${name}`]: config } },
+                { upsert: true },
+            );
+    }
+
 }

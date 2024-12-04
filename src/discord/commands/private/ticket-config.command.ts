@@ -1,10 +1,11 @@
-import type { ChatInputCommandInteraction } from 'discord.js';
+import {CategoryChannel, ChatInputCommandInteraction} from 'discord.js';
 import { PermissionsBitField } from 'discord.js';
 import { ApplicationCommandOptionType, ApplicationCommandType } from 'discord-api-types/v10';
 
 import type TicketBot from '../../ticketBot';
 import KingsDevEmbedBuilder from '../../utils/kingsDevEmbedBuilder';
 import BaseCommand from '../base.command';
+import {TicketConfig} from "../../../main/util/types";
 
 export default class TicketConfigCommand extends BaseCommand {
     constructor(client: TicketBot) {
@@ -176,10 +177,10 @@ export default class TicketConfigCommand extends BaseCommand {
 
     async listConfigs(interaction: ChatInputCommandInteraction) {
         const configs = await this.client.main.mongo.fetchTicketConfigs(interaction.guildId!);
-        if (!configs.length) return interaction.replyError('No ticket configs found.  Use `/ticket-config create` to create a new config.');
+        if (!Object.keys(configs).length) return interaction.replyError('No ticket configs found.  Use `/ticket-config create` to create a new config.');
 
 
-        return interaction.reply({
+        return interaction.editReply({
             embeds: [
                 new KingsDevEmbedBuilder()
                     .setTitle('Ticket Configs')
@@ -187,7 +188,7 @@ export default class TicketConfigCommand extends BaseCommand {
                         Object.entries(configs)
                             .map(([
                                 name, config
-                            ]) => `**• ${name}** - <#${config.category}> - ${config.nameTemplate} - ${config.maxTickets}`)
+                            ]) => `**• ${name}** - <#${config.category}> - \`${config.nameTemplate}\` (${config.maxTickets})`)
                             .join('\n'),
                     )
                     .setColor(0x006994),
@@ -197,11 +198,35 @@ export default class TicketConfigCommand extends BaseCommand {
 
     async createConfig(interaction: ChatInputCommandInteraction) {
         const name = interaction.options.getString('name', true);
-        const category = interaction.options.getChannel('category', true);
+        const categoryOpt = interaction.options.getChannel('category', true);
         const nameTemplate = interaction.options.getString('name-template', true);
         const maxTickets = interaction.options.getInteger('max-tickets', true);
 
+        const configs = await this.client.main.mongo.fetchTicketConfigs(interaction.guildId!);
+        if (configs[name])
+            return interaction.replyError('A ticket config with that name already exists.');
 
+        const category = await this.client.channels.fetch(categoryOpt.id)
+            .catch(() => null);
+        if (!category || !(category instanceof CategoryChannel))
+            return interaction.replyError('Category not found.');
+
+        if (maxTickets < 0)
+            return interaction.replyError('Max tickets must be at least 0.');
+
+        const config: TicketConfig = {
+            guildId: interaction.guildId!,
+            category: category.id,
+            nameTemplate,
+            managerRoles: [],
+            viewerRoles: [],
+            managerUsers: [],
+            viewerUsers: [],
+            maxTickets,
+        };
+
+        await this.client.main.mongo.addTicketConfig(name, config);
+        return interaction.replySuccess(`Ticket config \`${name}\` created.`);
     }
 
     async editConfig(interaction: ChatInputCommandInteraction) {
