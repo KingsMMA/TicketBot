@@ -82,6 +82,19 @@ export default class TicketConfigCommand extends BaseCommand {
                     ],
                 },
                 {
+                    name: 'set-message',
+                    description: 'Set the message to be sent at the start of tickets.',
+                    type: ApplicationCommandOptionType.Subcommand,
+                    options: [
+                        {
+                            name: 'name',
+                            description: 'The name of the ticket config.',
+                            type: ApplicationCommandOptionType.String,
+                            required: true,
+                        },
+                    ],
+                },
+                {
                     name: 'set-default-override',
                     description: 'Set a default override.',
                     type: ApplicationCommandOptionType.Subcommand,
