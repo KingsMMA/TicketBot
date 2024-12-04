@@ -1,8 +1,8 @@
-import type {AutocompleteInteraction, ChatInputCommandInteraction, GuildTextBasedChannel} from 'discord.js';
-import {PermissionsBitField} from 'discord.js';
-import {ApplicationCommandOptionType, ApplicationCommandType, ChannelType} from 'discord-api-types/v10';
+import type { AutocompleteInteraction, ChatInputCommandInteraction, GuildTextBasedChannel } from 'discord.js';
+import { PermissionsBitField } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType } from 'discord-api-types/v10';
 
-import type {DbMessage, TicketPanel} from '../../../main/util/types';
+import type { DbMessage, TicketPanel } from '../../../main/util/types';
 import type ticketBot from '../../ticketBot';
 import DbMessageEditor from '../../utils/dbMessageEditor';
 import BaseCommand from '../base.command';
@@ -37,7 +37,9 @@ export default class PanelCommand extends BaseCommand {
                             description: 'The channel to send the panel to.',
                             type: ApplicationCommandOptionType.Channel,
                             required: false,
-                            channel_types: [ ChannelType.GuildText ],
+                            channel_types: [
+                                ChannelType.GuildText 
+                            ],
                         },
                     ],
                 },

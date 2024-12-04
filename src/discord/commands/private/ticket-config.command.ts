@@ -1,26 +1,25 @@
+import type {
+    ChatInputCommandInteraction } from 'discord.js';
 import {
     type AutocompleteInteraction,
     CategoryChannel,
-    ChatInputCommandInteraction,
-    GuildMember,
-    Role,
-    User
+    Role
 } from 'discord.js';
 import { PermissionsBitField } from 'discord.js';
-import {
-    APIGuildMember,
-    APIRole, APIUser,
-    ApplicationCommandOptionType,
-    ApplicationCommandType,
-    ChannelType,
+import type {
     Snowflake
 } from 'discord-api-types/v10';
+import {
+    ApplicationCommandOptionType,
+    ApplicationCommandType,
+    ChannelType
+} from 'discord-api-types/v10';
 
+import type { TicketConfig } from '../../../main/util/types';
 import type TicketBot from '../../ticketBot';
+import DbMessageEditor from '../../utils/dbMessageEditor';
 import KingsDevEmbedBuilder from '../../utils/kingsDevEmbedBuilder';
 import BaseCommand from '../base.command';
-import {TicketConfig} from "../../../main/util/types";
-import DbMessageEditor from "../../utils/dbMessageEditor";
 
 export default class TicketConfigCommand extends BaseCommand {
     constructor(client: TicketBot) {
@@ -51,7 +50,9 @@ export default class TicketConfigCommand extends BaseCommand {
                             description: 'The category to create tickets in.',
                             type: ApplicationCommandOptionType.Channel,
                             required: true,
-                            channel_types: [ ChannelType.GuildCategory ],
+                            channel_types: [
+                                ChannelType.GuildCategory 
+                            ],
                         },
                         {
                             name: 'name-template',
@@ -84,7 +85,9 @@ export default class TicketConfigCommand extends BaseCommand {
                             description: 'The category to create tickets in.',
                             type: ApplicationCommandOptionType.Channel,
                             required: false,
-                            channel_types: [ ChannelType.GuildCategory ],
+                            channel_types: [
+                                ChannelType.GuildCategory 
+                            ],
                         },
                         {
                             name: 'name-template',
@@ -275,7 +278,7 @@ export default class TicketConfigCommand extends BaseCommand {
         if (!configs[name])
             return interaction.replyError('Ticket config not found.');
 
-        let config = configs[name];
+        const config = configs[name];
         if (categoryOpt) {
             const category = await this.client.channels.fetch(categoryOpt.id)
                 .catch(() => null);
@@ -369,7 +372,7 @@ export default class TicketConfigCommand extends BaseCommand {
             return interaction.replyError('Invalid user or role.');
         }
 
-        let suffix: 'Roles' | 'Users' = (userRole instanceof Role) ? 'Roles' : 'Users';
+        const suffix: 'Roles' | 'Users' = (userRole instanceof Role) ? 'Roles' : 'Users';
 
         if (!config[`viewer${suffix}`].includes(targetId) && !config[`manager${suffix}`].includes(targetId))
             return interaction.replyError('No override was set for that user or role.');
