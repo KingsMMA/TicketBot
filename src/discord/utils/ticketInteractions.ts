@@ -1,6 +1,12 @@
-import type { ButtonInteraction, ChatInputCommandInteraction } from 'discord.js';
+import {
+    ButtonInteraction,
+    ChatInputCommandInteraction,
+    GuildMemberRoleManager,
+    GuildTextBasedChannel, PermissionsBitField
+} from 'discord.js';
 
 import { main } from '../../main/main';
+import {PermissionFlagsBits} from "discord-api-types/v10";
 
 export class TicketInteractions {
 
@@ -29,6 +35,23 @@ export class TicketInteractions {
         const ticketChannelId = await main.client.tickets.createTicket(member, ticketConfig);
         if (!ticketChannelId) return interaction.replyError('Failed to create ticket.');
         return interaction.editReply(`Ticket created!  <#${ticketChannelId}>`);
+    }
+
+    static async closeTicket(interaction: ChatInputCommandInteraction | ButtonInteraction): Promise<any> {
+        if (!interaction.deferred) await interaction.deferReply({ ephemeral: true });
+
+        const ticket = await main.mongo.fetchTicket(interaction.guildId!, interaction.channelId);
+        if (!ticket) return interaction.replyError('This can only be done inside tickets.');
+        
+        if (!(
+            (ticket.owner === interaction.user.id && ticket.ownerCanManage) ||
+                ticket.managerUsers.includes(interaction.user.id) ||
+            (interaction.member!.roles as GuildMemberRoleManager).cache.some(role => ticket.managerRoles.includes(role.id)) ||
+            ((interaction.member!.permissions as PermissionsBitField).has(PermissionFlagsBits.ManageChannels, true))
+        )) return interaction.replyError('You do not have permission to close this ticket.');
+
+        await interaction.editReply('Closing ticket...');
+        await main.client.tickets.closeTicket(ticket, interaction.channel as GuildTextBasedChannel);
     }
 
 }

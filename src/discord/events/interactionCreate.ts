@@ -35,6 +35,8 @@ export default class {
                 const ticketConfigName = interaction.customId.split(':')[1];
 
                 return TicketInteractions.createTicket(interaction, ticketConfigName);
+            } else if (interaction.customId === 'close') {
+                return TicketInteractions.closeTicket(interaction);
             }
         }
     }

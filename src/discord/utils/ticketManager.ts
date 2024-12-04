@@ -1,4 +1,4 @@
-import type { GuildMember } from 'discord.js';
+import type {GuildMember, GuildTextBasedChannel} from 'discord.js';
 import type { Snowflake } from 'discord-api-types/v10';
 import { ChannelType, PermissionFlagsBits } from 'discord-api-types/v10';
 
@@ -82,6 +82,12 @@ export class TicketManager {
         await this.client.main.mongo.addTicket(ticket);
 
         return ticketChannel.id;
+    }
+
+    async closeTicket(ticket: ActiveTicket, channel: GuildTextBasedChannel): Promise<void> {
+        await channel.send('Closing ticket...');
+        await this.client.main.mongo.removeTicket(ticket.guildId, ticket.id);
+        await channel.delete();
     }
 
 }

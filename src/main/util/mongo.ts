@@ -95,6 +95,13 @@ export default class Mongo {
             .then(doc => doc?.tickets || {});
     }
 
+    async fetchTicket(guildId: Snowflake, ticketId: Snowflake): Promise<ActiveTicket | null> {
+        return this.mongo
+            .collection('activeTickets')
+            .findOne({ guildId })
+            .then(doc => doc?.tickets[ticketId] || null);
+    }
+
     async addTicket(ticket: ActiveTicket) {
         return this.mongo
             .collection('activeTickets')
@@ -102,6 +109,15 @@ export default class Mongo {
                 { guildId: ticket.guildId },
                 { $set: { [`tickets.${ticket.id}`]: ticket } },
                 { upsert: true },
+            );
+    }
+
+    async removeTicket(guildId: Snowflake, ticketId: Snowflake) {
+        return this.mongo
+            .collection('activeTickets')
+            .updateOne(
+                { guildId },
+                { $unset: { [`tickets.${ticketId}`]: '' } },
             );
     }
 
