@@ -428,6 +428,7 @@ export default class DbMessageEditor {
                                 });
                                 await this.updateMessage();
                                 await this.updateEditor();
+                                await buttonSubmission.deleteReply();
                             } catch (e) {
                                 console.error(e);
                                 void buttonSubmission.editReply({
