@@ -71,6 +71,26 @@ export default class PanelCommand extends BaseCommand {
                     ],
                 },
                 {
+                    name: 'clone',
+                    description: 'Clone a ticket panel.',
+                    type: ApplicationCommandOptionType.Subcommand,
+                    options: [
+                        {
+                            name: 'panel',
+                            description: 'The panel to clone.',
+                            type: ApplicationCommandOptionType.String,
+                            required: true,
+                            autocomplete: true,
+                        },
+                        {
+                            name: 'new-panel',
+                            description: 'The name of the new panel.',
+                            type: ApplicationCommandOptionType.String,
+                            required: true,
+                        },
+                    ],
+                },
+                {
                     name: 'delete',
                     description: 'Delete a ticket panel.',
                     type: ApplicationCommandOptionType.Subcommand,
@@ -100,6 +120,8 @@ export default class PanelCommand extends BaseCommand {
                 return this.createPanel(interaction);
             case 'edit':
                 return this.editPanel(interaction);
+            case 'clone':
+                return this.clonePanel(interaction);
             case 'delete':
                 return this.deletePanel(interaction);
             default:
@@ -175,6 +197,24 @@ export default class PanelCommand extends BaseCommand {
 
         await this.client.main.mongo.updatePanel(panel);
         return interaction.replySuccess(`Panel \`${panelName}\` was edited.`);
+    }
+
+    async clonePanel(interaction: ChatInputCommandInteraction) {
+        const panelName = interaction.options.getString('panel', true);
+        const newPanelName = interaction.options.getString('new-panel', true);
+        const panels = await this.client.main.mongo.getPanels(interaction.guildId!);
+        const panel = panels.find(p => p.name === panelName);
+        if (!panel) return interaction.replyError('Panel not found.');
+        if (panels.find(p => p.name === newPanelName)) return interaction.replyError('A panel with that name already exists.');
+
+        const newPanel: TicketPanel = {
+            guildId: interaction.guildId!,
+            name: newPanelName,
+            message: panel.message,
+        };
+
+        await this.client.main.mongo.addPanel(newPanel);
+        return interaction.replySuccess(`Panel \`${panelName}\` was cloned as \`${newPanelName}\`.`);
     }
 
     async deletePanel(interaction: ChatInputCommandInteraction) {
