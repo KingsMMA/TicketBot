@@ -112,6 +112,15 @@ export default class Mongo {
             );
     }
 
+    async updateTicket(ticket: ActiveTicket) {
+        return this.mongo
+            .collection('activeTickets')
+            .updateOne(
+                { guildId: ticket.guildId },
+                { $set: { [`tickets.${ticket.id}`]: ticket } },
+            );
+    }
+
     async removeTicket(guildId: Snowflake, ticketId: Snowflake) {
         return this.mongo
             .collection('activeTickets')

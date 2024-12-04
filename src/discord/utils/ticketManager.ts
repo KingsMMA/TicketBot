@@ -6,7 +6,7 @@ import type { ActiveTicket, TicketConfig } from '../../main/util/types';
 import type TicketBot from '../ticketBot';
 import DbMessageEditor from './dbMessageEditor';
 
-const allowOverwrites: bigint[] = [
+export const allowOverwrites: bigint[] = [
     PermissionFlagsBits.ViewChannel,
     PermissionFlagsBits.SendMessages,
     PermissionFlagsBits.ReadMessageHistory,
@@ -88,6 +88,41 @@ export class TicketManager {
         await channel.send('Closing ticket...');
         await this.client.main.mongo.removeTicket(ticket.guildId, ticket.id);
         await channel.delete();
+    }
+
+    async recalculatePermissions(ticket: ActiveTicket) {
+        const channel = await this.client.channels.fetch(ticket.id) as GuildTextBasedChannel;
+        await channel.edit({
+            permissionOverwrites: [
+                {
+                    id: ticket.guildId,
+                    deny: [
+                        PermissionFlagsBits.ViewChannel
+                    ],
+                },
+                {
+                    id: ticket.owner,
+                    allow: allowOverwrites,
+                },
+                ...ticket.managerRoles.map(role => ({
+                    id: role,
+                    allow: allowOverwrites,
+                })),
+                ...ticket.viewerRoles.map(role => ({
+                    id: role,
+                    allow: allowOverwrites,
+                })),
+                ...ticket.managerUsers.map(user => ({
+                    id: user,
+                    allow: allowOverwrites,
+                })),
+                ...ticket.viewerUsers.map(user => ({
+                    id: user,
+                    allow: allowOverwrites,
+                }),
+                ),
+            ]
+        });
     }
 
 }
