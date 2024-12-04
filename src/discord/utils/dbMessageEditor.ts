@@ -404,20 +404,19 @@ export default class DbMessageEditor {
                         }).catch(() => null);
                         if (buttonSubmission) {
                             await buttonSubmission.deferReply({ ephemeral: true });
+                            console.log(JSON.stringify(buttonSubmission.components));
                             try {
                                 this.message.buttons.push({
                                     customId: buttonSubmission.components[0].components[0].value || '',
                                     label: buttonSubmission.components[1].components[0].value || '',
                                     style: ButtonStyle[buttonSubmission.components[2].components[0].value as keyof typeof ButtonStyle],
                                     disabled: buttonSubmission.components[3].components[0].value === 'true',
-                                    emoji: buttonSubmission.components[4].components[0].value ? {
-                                        name: buttonSubmission.components[5].components[0].value,
-                                        animated: false,
-                                    } : undefined,
+                                    emoji: buttonSubmission.components[4].components[0].value || undefined,
                                 });
                                 await this.updateMessage();
                                 await this.updateEditor();
                             } catch (e) {
+                                console.error(e);
                                 void buttonSubmission.editReply({
                                     content: 'Invalid button style / emoji.',
                                 });
@@ -505,7 +504,7 @@ export default class DbMessageEditor {
                                                 .setLabel('Button Emoji:')
                                                 .setRequired(false)
                                                 .setStyle(TextInputStyle.Short)
-                                                .setValue(button.emoji?.name || ''),
+                                                .setValue(button.emoji || ''),
                                         ]),
                                 )
                         );
@@ -524,10 +523,7 @@ export default class DbMessageEditor {
                         const newLabel = editButtonSubmission.components[1].components[0].value || '';
                         const newStyle = ButtonStyle[editButtonSubmission.components[2].components[0].value as keyof typeof ButtonStyle];
                         const newDisabled = editButtonSubmission.components[3].components[0].value === 'true';
-                        const newEmoji = editButtonSubmission.components[4].components[0].value ? {
-                            name: editButtonSubmission.components[4].components[0].value,
-                            animated: false,
-                        } : undefined;
+                        const newEmoji = editButtonSubmission.components[4].components[0].value || undefined;
                         button.customId = newId;
                         button.label = newLabel;
                         button.style = newStyle;

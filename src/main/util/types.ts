@@ -16,11 +16,7 @@ export type DbButton = {
     label: string;
     style: ButtonStyle;
     disabled: boolean;
-    emoji?: {
-        id?: string;
-        name?: string;
-        animated?: boolean;
-    };
+    emoji?: string;
 };
 
 export type DbMessage = {
