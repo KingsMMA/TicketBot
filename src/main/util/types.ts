@@ -41,6 +41,7 @@ export type TicketConfig = {
     viewerUsers: Snowflake[];
     maxTickets: number;
     message?: DbMessage;
+    type: string;
 };
 
 export type ActiveTicket = TicketConfig & {

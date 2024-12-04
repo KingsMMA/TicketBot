@@ -262,6 +262,7 @@ export default class TicketConfigCommand extends BaseCommand {
             managerUsers: [],
             viewerUsers: [],
             maxTickets,
+            type: name,
         };
 
         await this.client.main.mongo.addTicketConfig(name, config);

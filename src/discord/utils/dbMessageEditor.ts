@@ -371,7 +371,7 @@ export default class DbMessageEditor {
                                                 .setLabel('Button ID:')
                                                 .setRequired(true)
                                                 .setStyle(TextInputStyle.Short)
-                                                .setPlaceholder('"create-ticket-${ticket-name}", "close"'),
+                                                .setPlaceholder('"create-ticket:${ticket-name}", "close"'),
                                         ]),
                                     new ActionRowBuilder<TextInputBuilder>()
                                         .addComponents([

@@ -3,7 +3,7 @@ import type { Db } from 'mongodb';
 import { MongoClient } from 'mongodb';
 
 import type Main from '../main';
-import type { TicketConfig, TicketPanel } from './types';
+import type { ActiveTicket, TicketConfig, TicketPanel } from './types';
 
 export default class Mongo {
     private mongo!: Db;
@@ -85,6 +85,23 @@ export default class Mongo {
             .updateOne(
                 { guildId },
                 { $unset: { [`configs.${name}`]: '' } },
+            );
+    }
+
+    async fetchActiveTickets(guildId: Snowflake): Promise<Record<Snowflake, ActiveTicket>> {
+        return this.mongo
+            .collection('activeTickets')
+            .findOne({ guildId })
+            .then(doc => doc?.tickets || {});
+    }
+
+    async addTicket(ticket: ActiveTicket) {
+        return this.mongo
+            .collection('activeTickets')
+            .updateOne(
+                { guildId: ticket.guildId },
+                { $set: { [`tickets.${ticket.id}`]: ticket } },
+                { upsert: true },
             );
     }
 

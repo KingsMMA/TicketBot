@@ -5,14 +5,17 @@ import path from 'path';
 
 import type Main from '../main/main';
 import type BaseCommand from './commands/base.command';
+import { TicketManager } from './utils/ticketManager';
 
 export default class TicketBot extends Client {
     main: Main;
+    tickets: TicketManager;
     commands: Collection<string, BaseCommand> = new Collection();
 
     constructor(main: Main, options: ClientOptions) {
         super(options);
         this.main = main;
+        this.tickets = new TicketManager(this);
 
         this.on('error', console.error);
     }
