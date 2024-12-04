@@ -1,11 +1,19 @@
-import {CategoryChannel, ChatInputCommandInteraction} from 'discord.js';
+import {CategoryChannel, ChatInputCommandInteraction, GuildMember, Role, User} from 'discord.js';
 import { PermissionsBitField } from 'discord.js';
-import { ApplicationCommandOptionType, ApplicationCommandType } from 'discord-api-types/v10';
+import {
+    APIGuildMember,
+    APIRole, APIUser,
+    ApplicationCommandOptionType,
+    ApplicationCommandType,
+    ChannelType,
+    Snowflake
+} from 'discord-api-types/v10';
 
 import type TicketBot from '../../ticketBot';
 import KingsDevEmbedBuilder from '../../utils/kingsDevEmbedBuilder';
 import BaseCommand from '../base.command';
 import {TicketConfig} from "../../../main/util/types";
+import DbMessageEditor from "../../utils/dbMessageEditor";
 
 export default class TicketConfigCommand extends BaseCommand {
     constructor(client: TicketBot) {
@@ -36,6 +44,7 @@ export default class TicketConfigCommand extends BaseCommand {
                             description: 'The category to create tickets in.',
                             type: ApplicationCommandOptionType.Channel,
                             required: true,
+                            channel_types: [ ChannelType.GuildCategory ],
                         },
                         {
                             name: 'name-template',
@@ -67,6 +76,7 @@ export default class TicketConfigCommand extends BaseCommand {
                             description: 'The category to create tickets in.',
                             type: ApplicationCommandOptionType.Channel,
                             required: false,
+                            channel_types: [ ChannelType.GuildCategory ],
                         },
                         {
                             name: 'name-template',
@@ -101,6 +111,12 @@ export default class TicketConfigCommand extends BaseCommand {
                     type: ApplicationCommandOptionType.Subcommand,
                     options: [
                         {
+                            name: 'name',
+                            description: 'The name of the ticket config.',
+                            type: ApplicationCommandOptionType.String,
+                            required: true,
+                        },
+                        {
                             name: 'user-role',
                             description: 'The user or role to set the override for.',
                             type: ApplicationCommandOptionType.Mentionable,
@@ -129,6 +145,12 @@ export default class TicketConfigCommand extends BaseCommand {
                     description: 'Remove a default override.',
                     type: ApplicationCommandOptionType.Subcommand,
                     options: [
+                        {
+                            name: 'name',
+                            description: 'The name of the ticket config.',
+                            type: ApplicationCommandOptionType.String,
+                            required: true,
+                        },
                         {
                             name: 'user-role',
                             description: 'The user or role to remove the override for.',
@@ -164,6 +186,8 @@ export default class TicketConfigCommand extends BaseCommand {
                 return this.createConfig(interaction);
             case 'edit':
                 return this.editConfig(interaction);
+            case 'set-message':
+                return this.setMessage(interaction);
             case 'set-default-override':
                 return this.setDefaultOverride(interaction);
             case 'remove-default-override':
@@ -260,13 +284,89 @@ export default class TicketConfigCommand extends BaseCommand {
         return interaction.replySuccess(`Ticket config \`${name}\` updated.`);
     }
 
+    async setMessage(interaction: ChatInputCommandInteraction) {
+        const name = interaction.options.getString('name', true);
+
+        const configs = await this.client.main.mongo.fetchTicketConfigs(interaction.guildId!);
+        if (!configs[name])
+            return interaction.replyError('Ticket config not found.');
+
+        let message = configs[name].message;
+
+        if (!message) message = { content: '', embeds: [], buttons: [] };
+        message = await new DbMessageEditor(message)
+            .editMessage(interaction);
+        if (message.content === '' && message.embeds.length === 0 && message.buttons.length === 0)
+            message = undefined;
+
+        configs[name].message = message;
+        await this.client.main.mongo.updateTicketConfig(name, configs[name]);
+        return interaction.replySuccess(`Message for ticket config \`${name}\` updated.`);
+    }
+
     async setDefaultOverride(interaction: ChatInputCommandInteraction) {
+        const name = interaction.options.getString('name', true);
         const userRole = interaction.options.getMentionable('user-role', true);
         const permission = interaction.options.getString('permission', true);
+
+        const configs = await this.client.main.mongo.fetchTicketConfigs(interaction.guildId!);
+        if (!configs[name])
+            return interaction.replyError('Ticket config not found.');
+
+        const config = configs[name];
+        let override: 'managerRoles' | 'viewerRoles' | 'managerUsers' | 'viewerUsers';
+        if (userRole instanceof Role)
+            override = permission === 'view' ? 'viewerRoles' : 'managerRoles';
+        else
+            override = permission === 'view' ? 'viewerUsers' : 'managerUsers';
+
+        let targetId: Snowflake;
+        if (interaction.options.resolved?.roles) {
+            targetId = interaction.options.resolved.roles.at(0)!.id;
+        } else if (interaction.options.resolved?.users) {
+            targetId = interaction.options.resolved.users.at(0)!.id;
+        } else {
+            return interaction.replyError('Invalid user or role.');
+        }
+
+        if (config[override].includes(targetId))
+            return interaction.replyError('Override already set.');
+
+        config[override].push(targetId);
+        await this.client.main.mongo.updateTicketConfig(name, config);
+
+        return interaction.replySuccess(`Default override set for ${userRole} with permission \`${permission}\`.`);
     }
 
     async removeDefaultOverride(interaction: ChatInputCommandInteraction) {
+        const name = interaction.options.getString('name', true);
         const userRole = interaction.options.getMentionable('user-role', true);
+
+        const configs = await this.client.main.mongo.fetchTicketConfigs(interaction.guildId!);
+        if (!configs[name])
+            return interaction.replyError('Ticket config not found.');
+
+        const config = configs[name];
+
+        let targetId: Snowflake;
+        if (interaction.options.resolved?.roles) {
+            targetId = interaction.options.resolved.roles.at(0)!.id;
+        } else if (interaction.options.resolved?.users) {
+            targetId = interaction.options.resolved.users.at(0)!.id;
+        } else {
+            return interaction.replyError('Invalid user or role.');
+        }
+
+        let suffix: 'Roles' | 'Users' = (userRole instanceof Role) ? 'Roles' : 'Users';
+
+        if (!config[`viewer${suffix}`].includes(targetId) && !config[`manager${suffix}`].includes(targetId))
+            return interaction.replyError('No override was set for that user or role.');
+
+        config[`viewer${suffix}`] = config[`viewer${suffix}`].filter(id => id !== targetId);
+        config[`manager${suffix}`] = config[`manager${suffix}`].filter(id => id !== targetId);
+        await this.client.main.mongo.updateTicketConfig(name, config);
+
+        return interaction.replySuccess(`Default override removed for ${userRole}.`);
     }
 
     async deleteConfig(interaction: ChatInputCommandInteraction) {
