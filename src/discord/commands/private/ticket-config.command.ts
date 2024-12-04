@@ -275,7 +275,10 @@ export default class TicketConfigCommand extends BaseCommand {
             embeds: [
                 new KingsDevEmbedBuilder()
                     .setTitle(`Ticket Config: ${name}`)
-                    .setDescription(`You can view and/or edit the message sent at the start of tickets of this type by using \`/ticket-config set-message\`.  Tickets of this type can be created using a button with ID \`create-ticket:${name}\` or with \`/create ${name}\`.`)
+                    .setDescription(`You can view and/or edit the message sent at the start of tickets of this type by using \`/ticket-config set-message ${
+                        name
+                    }\`.  Tickets of this type can be created using a button with ID \`create-ticket:${name}\` or with \`/create ${name
+                    }\`.\n\nUsers specified as managers will have the ability to use \`/close\`, \`/add\`, and \`/remove\` in tickets of this type, while users specified as viewers will only be able to view tickets of this type.  Users with \`Manage Channels\` are always a manager by default.`)
                     .addField('Category', `<#${config.category}>`, true)
                     .addField('Name Template', config.nameTemplate, true)
                     .addField('Max Tickets', config.maxTickets.toString(), true)
