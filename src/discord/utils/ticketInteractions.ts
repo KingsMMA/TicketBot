@@ -1,11 +1,11 @@
-import {ButtonInteraction, ChatInputCommandInteraction} from "discord.js";
-import {Snowflake} from "discord-api-types/v10";
-import {main} from "../../main/main";
+import type { ButtonInteraction, ChatInputCommandInteraction } from 'discord.js';
+
+import { main } from '../../main/main';
 
 export class TicketInteractions {
 
     static async createTicket(interaction: ChatInputCommandInteraction | ButtonInteraction, ticketConfigName: string): Promise<any> {
-        if (!interaction.deferred) await interaction.deferReply({ephemeral: true});
+        if (!interaction.deferred) await interaction.deferReply({ ephemeral: true });
 
         const ticketConfig = await main.mongo.fetchTicketConfigs(interaction.guildId!)
             .then(configs => configs[ticketConfigName]);

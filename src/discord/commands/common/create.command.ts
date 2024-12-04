@@ -1,11 +1,9 @@
-import type {AutocompleteInteraction, ChatInputCommandInteraction} from 'discord.js';
-import {PermissionsBitField} from 'discord.js';
-import {ApplicationCommandOptionType, ApplicationCommandType} from 'discord-api-types/v10';
+import type { AutocompleteInteraction, ChatInputCommandInteraction } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType } from 'discord-api-types/v10';
 
 import type TicketBot from '../../ticketBot';
-import KingsDevEmbedBuilder from '../../utils/kingsDevEmbedBuilder';
+import { TicketInteractions } from '../../utils/ticketInteractions';
 import BaseCommand from '../base.command';
-import {TicketInteractions} from "../../utils/ticketInteractions";
 
 export default class CreateCommand extends BaseCommand {
     constructor(client: TicketBot) {

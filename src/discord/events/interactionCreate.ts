@@ -1,7 +1,7 @@
 import type { Interaction } from 'discord.js';
 
 import type TicketBot from '../ticketBot';
-import {createTicket, TicketInteractions} from "../utils/ticketInteractions";
+import { TicketInteractions } from '../utils/ticketInteractions';
 
 export default class {
     client: TicketBot;
