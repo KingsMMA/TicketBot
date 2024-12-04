@@ -6,6 +6,8 @@
 
 Ticket Bot is an advanced ticketing management system, with it's most unique selling point being the ticket panels being fully customisable from inside Discord.  The bot stores all of its data per-server, meaning one instance of the bot can handle the tickets for an unlimited number of discord servers.  The bot allows users to create tickets using the ticket configs provided by server staff, with extensive customisability being supported.  Server staff can setup which users and roles (and optionally the ticket owner) can manage the ticket; they can also configure the category, name template, maximum number of tickets per user, and default role overrides for each individual ticket config.  Users and roles can be added to tickets as either a viewer or a manager.  As previously stated, the ticket panels and starting messages are fully configurable from inside Discord.
 
+**Video demonstration:** https://youtu.be/KiS5SUbkiZw
+
 The name template and the message content for ticket configs can contain the following variables:
 
 | Variable  | Result                      |  
