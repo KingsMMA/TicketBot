@@ -162,7 +162,8 @@ export default class DbMessageEditor {
                             .catch(() => null);
                         if (descriptionSubmission) {
                             void descriptionSubmission.deferUpdate();
-                            this.message.embeds[0].description = descriptionSubmission.components[0].components[0].value || 'Please provide a description.';
+                            this.message.embeds[0].description = descriptionSubmission.components[0].components[0].value
+                                .replaceAll('\\n', '\n') || 'Please provide a description.';
                             await this.updateMessage();
                         }
                         break;
