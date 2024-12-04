@@ -35,6 +35,20 @@ export default class TicketConfigCommand extends BaseCommand {
                     type: ApplicationCommandOptionType.Subcommand,
                 },
                 {
+                    name: 'view',
+                    description: 'View a ticket config.',
+                    type: ApplicationCommandOptionType.Subcommand,
+                    options: [
+                        {
+                            name: 'name',
+                            description: 'The name of the ticket config.',
+                            type: ApplicationCommandOptionType.String,
+                            required: true,
+                            autocomplete: true,
+                        },
+                    ],
+                },
+                {
                     name: 'create',
                     description: 'Create a new ticket config.',
                     type: ApplicationCommandOptionType.Subcommand,
@@ -209,6 +223,8 @@ export default class TicketConfigCommand extends BaseCommand {
         switch (interaction.options.getSubcommand()) {
             case 'list':
                 return this.listConfigs(interaction);
+            case 'view':
+                return this.viewConfig(interaction);
             case 'create':
                 return this.createConfig(interaction);
             case 'edit':
@@ -245,6 +261,32 @@ export default class TicketConfigCommand extends BaseCommand {
                     .setColor(0x006994),
             ],
         });
+    }
+
+    async viewConfig(interaction: ChatInputCommandInteraction) {
+        const name = interaction.options.getString('name', true);
+
+        const configs = await this.client.main.mongo.fetchTicketConfigs(interaction.guildId!);
+        if (!configs[name])
+            return interaction.replyError('Ticket config not found.');
+
+        const config = configs[name];
+        return interaction.editReply({
+            embeds: [
+                new KingsDevEmbedBuilder()
+                    .setTitle(`Ticket Config: ${name}`)
+                    .setDescription(`You can view and/or edit the message sent at the start of tickets of this type by using \`/ticket-config set-message\`.  Tickets of this type can be created using a button with ID \`create-ticket:${name}\` or with \`/create ${name}\`.`)
+                    .addField('Category', `<#${config.category}>`, true)
+                    .addField('Name Template', config.nameTemplate, true)
+                    .addField('Max Tickets', config.maxTickets.toString(), true)
+                    .addField('Can Owner Manage?', config.ownerCanManage ? 'Yes' : 'No', true)
+                    .addField('Default Manager Roles', config.managerRoles.length ? config.managerRoles.map(id => `<@&${id}>`).join(', ') : 'None', true)
+                    .addField('Default Viewer Roles', config.viewerRoles.length ? config.viewerRoles.map(id => `<@&${id}>`).join(', ') : 'None', true)
+                    .addField('Default Manager Users', config.managerUsers.length ? config.managerUsers.map(id => `<@${id}>`).join(', ') : 'None', true)
+                    .addField('Default Viewer Users', config.viewerUsers.length ? config.viewerUsers.map(id => `<@${id}>`).join(', ') : 'None', true)
+                    .setColor('Blurple'),
+            ]
+        })
     }
 
     async createConfig(interaction: ChatInputCommandInteraction) {

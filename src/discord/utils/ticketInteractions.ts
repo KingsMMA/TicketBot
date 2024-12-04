@@ -42,7 +42,7 @@ export class TicketInteractions {
 
         const ticket = await main.mongo.fetchTicket(interaction.guildId!, interaction.channelId);
         if (!ticket) return interaction.replyError('This can only be done inside tickets.');
-        
+
         if (!(
             (ticket.owner === interaction.user.id && ticket.ownerCanManage) ||
                 ticket.managerUsers.includes(interaction.user.id) ||
