@@ -168,7 +168,7 @@ export default class PanelCommand extends BaseCommand {
         message = await new DbMessageEditor(message).editMessage(interaction);
         panel.message = message;
 
-        await this.client.main.mongo.addPanel(panel);
+        await this.client.main.mongo.updatePanel(panel);
         return interaction.replySuccess(`Panel \`${panelName}\` was edited.`);
     }
 

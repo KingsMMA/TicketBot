@@ -44,4 +44,13 @@ export default class Mongo {
             );
     }
 
+    async updatePanel(panel: TicketPanel) {
+        return this.mongo
+            .collection('panels')
+            .updateOne(
+                { guildId: panel.guildId, 'panels.name': panel.name },
+                { $set: { 'panels.$': panel } },
+            );
+    }
+
 }
