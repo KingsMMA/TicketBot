@@ -70,4 +70,22 @@ export default class Mongo {
             );
     }
 
+    async updateTicketConfig(name: string, config: TicketConfig) {
+        return this.mongo
+            .collection('ticketConfigs')
+            .updateOne(
+                { guildId: config.guildId },
+                { $set: { [`configs.${name}`]: config } },
+            );
+    }
+
+    async deleteTicketConfig(guildId: Snowflake, name: string) {
+        return this.mongo
+            .collection('ticketConfigs')
+            .updateOne(
+                { guildId },
+                { $unset: { [`configs.${name}`]: '' } },
+            );
+    }
+
 }

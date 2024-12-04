@@ -66,19 +66,19 @@ export default class TicketConfigCommand extends BaseCommand {
                             name: 'category',
                             description: 'The category to create tickets in.',
                             type: ApplicationCommandOptionType.Channel,
-                            required: true,
+                            required: false,
                         },
                         {
                             name: 'name-template',
                             description: 'The template for the ticket name.',
                             type: ApplicationCommandOptionType.String,
-                            required: true,
+                            required: false,
                         },
                         {
                             name: 'max-tickets',
                             description: 'The maximum amount of tickets a user can have open.',
                             type: ApplicationCommandOptionType.Integer,
-                            required: true,
+                            required: false,
                         },
                     ],
                 },
@@ -231,9 +231,33 @@ export default class TicketConfigCommand extends BaseCommand {
 
     async editConfig(interaction: ChatInputCommandInteraction) {
         const name = interaction.options.getString('name', true);
-        const category = interaction.options.getChannel('category', true);
-        const nameTemplate = interaction.options.getString('name-template', true);
-        const maxTickets = interaction.options.getInteger('max-tickets', true);
+        const categoryOpt = interaction.options.getChannel('category');
+        const nameTemplate = interaction.options.getString('name-template');
+        const maxTickets = interaction.options.getInteger('max-tickets');
+
+        const configs = await this.client.main.mongo.fetchTicketConfigs(interaction.guildId!);
+        if (!configs[name])
+            return interaction.replyError('Ticket config not found.');
+
+        let config = configs[name];
+        if (categoryOpt) {
+            const category = await this.client.channels.fetch(categoryOpt.id)
+                .catch(() => null);
+            if (!category || !(category instanceof CategoryChannel))
+                return interaction.replyError('Category not found.');
+            config.category = category.id;
+        }
+
+        if (nameTemplate) config.nameTemplate = nameTemplate;
+
+        if (maxTickets) {
+            if (maxTickets < 0)
+                return interaction.replyError('Max tickets must be at least 0.');
+            config.maxTickets = maxTickets;
+        }
+
+        await this.client.main.mongo.updateTicketConfig(name, config);
+        return interaction.replySuccess(`Ticket config \`${name}\` updated.`);
     }
 
     async setDefaultOverride(interaction: ChatInputCommandInteraction) {
