@@ -310,7 +310,7 @@ export default class TicketConfigCommand extends BaseCommand {
                 return interaction.replyError('Max tickets must be at least 0.');
             config.maxTickets = maxTickets;
         }
-        
+
         if (canOwnerManage !== null) config.ownerCanManage = canOwnerManage;
 
         await this.client.main.mongo.updateTicketConfig(name, config);

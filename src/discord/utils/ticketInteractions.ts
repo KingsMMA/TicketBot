@@ -15,6 +15,8 @@ export class TicketInteractions {
             .then(tickets => Object.values(tickets))
             .then(tickets => tickets.filter(ticket => ticket.owner === interaction.user.id && ticket.type === ticketConfigName));
 
+        if (ticketConfig.maxTickets === 0)
+            return interaction.replyError('This ticket type is disabled.');
         if (usersOpenTickets.length >= ticketConfig.maxTickets)
             return interaction.replyError('You already have the maximum number of open tickets for this type.  Please close one before opening another.');
 
