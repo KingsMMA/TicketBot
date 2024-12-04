@@ -1,7 +1,7 @@
 import type { Interaction } from 'discord.js';
 
 import type TicketBot from '../ticketBot';
-import {createTicket} from "../utils/ticketInteractions";
+import {createTicket, TicketInteractions} from "../utils/ticketInteractions";
 
 export default class {
     client: TicketBot;
@@ -34,7 +34,7 @@ export default class {
             if (interaction.customId.startsWith('create-ticket:')) {
                 const ticketConfigName = interaction.customId.split(':')[1];
 
-                return createTicket(interaction, ticketConfigName);
+                return TicketInteractions.createTicket(interaction, ticketConfigName);
             }
         }
     }

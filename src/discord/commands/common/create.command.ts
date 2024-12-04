@@ -5,7 +5,7 @@ import {ApplicationCommandOptionType, ApplicationCommandType} from 'discord-api-
 import type TicketBot from '../../ticketBot';
 import KingsDevEmbedBuilder from '../../utils/kingsDevEmbedBuilder';
 import BaseCommand from '../base.command';
-import {createTicket} from "../../utils/ticketInteractions";
+import {TicketInteractions} from "../../utils/ticketInteractions";
 
 export default class CreateCommand extends BaseCommand {
     constructor(client: TicketBot) {
@@ -28,7 +28,7 @@ export default class CreateCommand extends BaseCommand {
     async execute(interaction: ChatInputCommandInteraction) {
         const ticketConfigName = interaction.options.getString('type', true);
 
-        return createTicket(interaction, ticketConfigName);
+        return TicketInteractions.createTicket(interaction, ticketConfigName);
     }
 
     async autocomplete(interaction: AutocompleteInteraction) {
