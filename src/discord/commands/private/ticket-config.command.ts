@@ -1,4 +1,11 @@
-import {CategoryChannel, ChatInputCommandInteraction, GuildMember, Role, User} from 'discord.js';
+import {
+    type AutocompleteInteraction,
+    CategoryChannel,
+    ChatInputCommandInteraction,
+    GuildMember,
+    Role,
+    User
+} from 'discord.js';
 import { PermissionsBitField } from 'discord.js';
 import {
     APIGuildMember,
@@ -70,6 +77,7 @@ export default class TicketConfigCommand extends BaseCommand {
                             description: 'The name of the ticket config.',
                             type: ApplicationCommandOptionType.String,
                             required: true,
+                            autocomplete: true,
                         },
                         {
                             name: 'category',
@@ -102,6 +110,7 @@ export default class TicketConfigCommand extends BaseCommand {
                             description: 'The name of the ticket config.',
                             type: ApplicationCommandOptionType.String,
                             required: true,
+                            autocomplete: true,
                         },
                     ],
                 },
@@ -115,6 +124,7 @@ export default class TicketConfigCommand extends BaseCommand {
                             description: 'The name of the ticket config.',
                             type: ApplicationCommandOptionType.String,
                             required: true,
+                            autocomplete: true,
                         },
                         {
                             name: 'user-role',
@@ -150,6 +160,7 @@ export default class TicketConfigCommand extends BaseCommand {
                             description: 'The name of the ticket config.',
                             type: ApplicationCommandOptionType.String,
                             required: true,
+                            autocomplete: true,
                         },
                         {
                             name: 'user-role',
@@ -169,6 +180,7 @@ export default class TicketConfigCommand extends BaseCommand {
                             description: 'The name of the ticket config.',
                             type: ApplicationCommandOptionType.String,
                             required: true,
+                            autocomplete: true,
                         },
                     ],
                 },
@@ -378,6 +390,28 @@ export default class TicketConfigCommand extends BaseCommand {
 
         await this.client.main.mongo.deleteTicketConfig(interaction.guildId!, name);
         return interaction.replySuccess(`Ticket config \`${name}\` deleted.`);
+    }
+
+    async autocomplete(interaction: AutocompleteInteraction) {
+        if (!interaction.guildId) return interaction.respond([]);
+
+        if (interaction.options.getFocused(true)?.name === 'name') {
+            const configs = await this.client.main.mongo.fetchTicketConfigs(interaction.guildId);
+
+            return interaction.respond(
+                Object.entries(configs)
+                    .filter(([name, _]) => name.toLowerCase()
+                        .includes(interaction.options.getString('name', true)
+                            .toLowerCase()))
+                    .map(([name, _]) => {
+                        return {
+                            name: name,
+                            value: name,
+                        };
+                    })
+            );
+        }
+
     }
 
 }
