@@ -1,5 +1,5 @@
 {
-  "mongo": {
-    "database": "Tickets"
-  }
+    "mongo": {
+        "database": "Tickets"
+    }
 }
