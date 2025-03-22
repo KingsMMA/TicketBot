@@ -1,17 +1,19 @@
 import chalk from 'chalk';
-import {
-    ActionRowBuilder,
-    ButtonBuilder,
+import type {
     InteractionReplyOptions,
     InteractionResponse,
     Message,
     MessagePayload
 } from 'discord.js';
+import {
+    ActionRowBuilder,
+    ButtonBuilder
+} from 'discord.js';
 import { ButtonInteraction } from 'discord.js';
 import { CommandInteraction } from 'discord.js';
+import { ButtonStyle, ComponentType } from 'discord-api-types/v10';
 
 import KingsDevEmbedBuilder from './kingsDevEmbedBuilder';
-import {ButtonStyle, ComponentType} from "discord-api-types/v10";
 
 const loggerInitialisedMessage = 'Logger initialised';
 

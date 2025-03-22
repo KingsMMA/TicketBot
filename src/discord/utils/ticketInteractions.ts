@@ -1,8 +1,8 @@
 import type {
-    GuildMemberRoleManager,
+    ChatInputCommandInteraction,    GuildMemberRoleManager,
     GuildTextBasedChannel, PermissionsBitField
 } from 'discord.js';
-import { ChatInputCommandInteraction, ButtonInteraction } from "discord.js";
+import { ButtonInteraction } from 'discord.js';
 import { PermissionFlagsBits } from 'discord-api-types/v10';
 
 import { main } from '../../main/main';

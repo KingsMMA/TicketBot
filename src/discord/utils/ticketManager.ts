@@ -3,11 +3,10 @@ import type { Snowflake } from 'discord-api-types/v10';
 import { ChannelType, PermissionFlagsBits } from 'discord-api-types/v10';
 import discordTranscripts from 'discord-html-transcripts';
 
-
 import type { ActiveTicket, TicketConfig } from '../../main/util/types';
 import type TicketBot from '../ticketBot';
 import DbMessageEditor from './dbMessageEditor';
-import KingsDevEmbedBuilder from "./kingsDevEmbedBuilder";
+import KingsDevEmbedBuilder from './kingsDevEmbedBuilder';
 
 export const allowOverwrites: bigint[] = [
     PermissionFlagsBits.ViewChannel,
