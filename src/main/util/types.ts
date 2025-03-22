@@ -43,6 +43,7 @@ export type TicketConfig = {
     maxTickets: number;
     message?: DbMessage;
     type: string;
+    logChannel?: Snowflake;
 };
 
 export type ActiveTicket = TicketConfig & {

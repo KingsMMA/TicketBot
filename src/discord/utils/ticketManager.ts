@@ -1,10 +1,13 @@
 import type { GuildMember, GuildTextBasedChannel } from 'discord.js';
 import type { Snowflake } from 'discord-api-types/v10';
 import { ChannelType, PermissionFlagsBits } from 'discord-api-types/v10';
+import discordTranscripts from 'discord-html-transcripts';
+
 
 import type { ActiveTicket, TicketConfig } from '../../main/util/types';
 import type TicketBot from '../ticketBot';
 import DbMessageEditor from './dbMessageEditor';
+import KingsDevEmbedBuilder from "./kingsDevEmbedBuilder";
 
 export const allowOverwrites: bigint[] = [
     PermissionFlagsBits.ViewChannel,
@@ -86,8 +89,61 @@ export class TicketManager {
 
     async closeTicket(ticket: ActiveTicket, channel: GuildTextBasedChannel): Promise<void> {
         await channel.send('Closing ticket...');
+        await this.saveTranscript(ticket, channel);
         await this.client.main.mongo.removeTicket(ticket.guildId, ticket.id);
         await channel.delete();
+    }
+
+    async saveTranscript(ticket: ActiveTicket, channel: GuildTextBasedChannel) {
+        const transcriptChannelId = ticket.logChannel;
+        if (!transcriptChannelId) return;
+        const transcriptChannel = await channel.guild.channels.fetch(transcriptChannelId)
+            .catch(() => null);
+        if (!transcriptChannel) return;
+
+        const savingMessage = await channel.send({
+            embeds: [
+                new KingsDevEmbedBuilder()
+                    .setTitle('Saving transcript...')
+                    .setDescription('Please wait while the transcript is saved.')
+                    .setColor('Yellow')
+            ]
+        });
+
+        const attachment = await discordTranscripts.createTranscript(channel, {
+            saveImages: true,
+            poweredBy: false,
+        });
+        const message = {
+            embeds: [
+                new KingsDevEmbedBuilder()
+                    .setTitle('Transcript')
+                    .setDescription(`Transcript for <#${channel.id}>`)
+                    .setColor('Blue')
+                    .addField('User', `<@${ticket.owner}>`, true)
+                    .addField('Type', ticket.type, true)
+            ],
+            files: [
+                attachment
+            ]
+        };
+
+        await (transcriptChannel as GuildTextBasedChannel)
+            .send(message)
+            .catch(() => null);
+
+        await this.client.users.fetch(ticket.owner)
+            .then(user => user.send(message))
+            .catch(() => null);
+
+        await savingMessage.edit({
+            embeds: [
+                new KingsDevEmbedBuilder()
+                    .setTitle('Transcript Saved')
+                    .setDescription('The transcript has been saved.')
+                    .setColor('Green')
+            ]
+        });
     }
 
     async recalculatePermissions(ticket: ActiveTicket) {

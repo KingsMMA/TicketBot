@@ -36,10 +36,14 @@ export default class CreateCommand extends BaseCommand {
 
         return interaction.respond(
             Object.entries(configs)
-                .filter(([name, _]) => name.toLowerCase()
+                .filter(([
+                    name, _
+                ]) => name.toLowerCase()
                     .includes(interaction.options.getString('type', true)
                         .toLowerCase()))
-                .map(([name, _]) => {
+                .map(([
+                    name, _
+                ]) => {
                     return {
                         name: name,
                         value: name,

@@ -85,7 +85,16 @@ export default class TicketConfigCommand extends BaseCommand {
                             description: 'Whether the ticket owner can manage the ticket - AKA add/remove users, close the ticket, etc..',
                             type: ApplicationCommandOptionType.Boolean,
                             required: true,
-                        }
+                        },
+                        {
+                            name: 'log-channel',
+                            description: 'The channel to log ticket transcripts in.',
+                            type: ApplicationCommandOptionType.Channel,
+                            required: false,
+                            channel_types: [
+                                ChannelType.GuildText
+                            ],
+                        },
                     ],
                 },
                 {
@@ -126,6 +135,15 @@ export default class TicketConfigCommand extends BaseCommand {
                             description: 'Whether the ticket owner can manage the ticket - AKA add/remove users, close the ticket, etc..',
                             type: ApplicationCommandOptionType.Boolean,
                             required: false,
+                        },
+                        {
+                            name: 'log-channel',
+                            description: 'The channel to log ticket transcripts in.',
+                            type: ApplicationCommandOptionType.Channel,
+                            required: false,
+                            channel_types: [
+                                ChannelType.GuildText
+                            ],
                         },
                     ],
                 },
@@ -313,6 +331,7 @@ export default class TicketConfigCommand extends BaseCommand {
                         .join(', ') : 'None', true)
                     .addField('Default Viewer Users', config.viewerUsers.length ? config.viewerUsers.map(id => `<@${id}>`)
                         .join(', ') : 'None', true)
+                    .addField('Log Channel', config.logChannel ? `<#${config.logChannel}>` : 'None', true)
                     .setColor('Blurple'),
             ]
         });
@@ -324,6 +343,7 @@ export default class TicketConfigCommand extends BaseCommand {
         const nameTemplate = interaction.options.getString('name-template', true);
         const maxTickets = interaction.options.getInteger('max-tickets', true);
         const canOwnerManage = interaction.options.getBoolean('can-owner-manage', true);
+        const logChannel = interaction.options.getChannel('log-channel');
 
         const configs = await this.client.main.mongo.fetchTicketConfigs(interaction.guildId!);
         if (configs[name])
@@ -348,6 +368,7 @@ export default class TicketConfigCommand extends BaseCommand {
             maxTickets,
             type: name,
             ownerCanManage: canOwnerManage,
+            logChannel: logChannel?.id,
         };
 
         await this.client.main.mongo.addTicketConfig(name, config);
@@ -360,6 +381,7 @@ export default class TicketConfigCommand extends BaseCommand {
         const nameTemplate = interaction.options.getString('name-template');
         const maxTickets = interaction.options.getInteger('max-tickets');
         const canOwnerManage = interaction.options.getBoolean('can-owner-manage');
+        const logChannel = interaction.options.getChannel('log-channel');
 
         const configs = await this.client.main.mongo.fetchTicketConfigs(interaction.guildId!);
         if (!configs[name])
@@ -383,6 +405,7 @@ export default class TicketConfigCommand extends BaseCommand {
         }
 
         if (canOwnerManage !== null) config.ownerCanManage = canOwnerManage;
+        if (logChannel) config.logChannel = logChannel.id;
 
         await this.client.main.mongo.updateTicketConfig(name, config);
         return interaction.replySuccess(`Ticket config \`${name}\` updated.`);
@@ -508,10 +531,14 @@ export default class TicketConfigCommand extends BaseCommand {
 
             return interaction.respond(
                 Object.entries(configs)
-                    .filter(([name, _]) => name.toLowerCase()
+                    .filter(([
+                        name, _
+                    ]) => name.toLowerCase()
                         .includes(interaction.options.getString('name', true)
                             .toLowerCase()))
-                    .map(([name, _]) => {
+                    .map(([
+                        name, _
+                    ]) => {
                         return {
                             name: name,
                             value: name,
