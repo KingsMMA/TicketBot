@@ -1,5 +1,9 @@
 {
     "mongo": {
         "database": "Tickets"
+    },
+    "closeConfirmation": {
+        "button": true,
+        "command": false
     }
 }

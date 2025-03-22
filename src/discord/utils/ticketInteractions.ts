@@ -1,9 +1,8 @@
 import type {
-    ButtonInteraction,
-    ChatInputCommandInteraction,
     GuildMemberRoleManager,
     GuildTextBasedChannel, PermissionsBitField
 } from 'discord.js';
+import { ChatInputCommandInteraction, ButtonInteraction } from "discord.js";
 import { PermissionFlagsBits } from 'discord-api-types/v10';
 
 import { main } from '../../main/main';
@@ -49,6 +48,10 @@ export class TicketInteractions {
             (interaction.member!.roles as GuildMemberRoleManager).cache.some(role => ticket.managerRoles.includes(role.id)) ||
             ((interaction.member!.permissions as PermissionsBitField).has(PermissionFlagsBits.ManageChannels, true))
         )) return interaction.replyError('You do not have permission to close this ticket.');
+
+        if (main.config.closeConfirmation[interaction instanceof ButtonInteraction ? 'button' : 'command']) {
+            if (!await interaction.replyConfirmation('Are you sure you want to close this ticket?')) return;
+        }
 
         await interaction.editReply('Closing ticket...');
         await main.client.tickets.closeTicket(ticket, interaction.channel as GuildTextBasedChannel);
